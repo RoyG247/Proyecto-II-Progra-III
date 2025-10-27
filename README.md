@@ -59,7 +59,7 @@ MIT License
 
 ---
 
-## 👤 Autor
+## 👤 Autores
 - RoyG247 (u otro autor)  
 Contacto: (añadir email o perfil)
 
