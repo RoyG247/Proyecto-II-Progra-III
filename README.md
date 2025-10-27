@@ -32,31 +32,6 @@ Breve resumen del objetivo del proyecto, sus funcionalidades principales y el pr
 
 ---
 
-## 🛠 Requisitos
-- Java 8 o superior (recomendado Java 11+)
-- JDK instalado y variable JAVA_HOME configurada
-- (Opcional) Maven o Gradle si usas un sistema de build
-
----
-
-## 🤝 Contribuciones
-1. Haz un fork del repositorio.
-2. Crea una rama con tu feature: `git checkout -b feature/nombre-feature`
-3. Realiza tus cambios y commitea: `git commit -m "Descripción del cambio"`
-4. Abre un Pull Request describiendo los cambios.
-
-Por favor, incluye información clara en el PR sobre cómo probar los cambios y cualquier requisito adicional.
-
----
-
-## 📄 Licencia
-Este repositorio puede estar bajo la licencia MIT (ejemplo). Si quieres otra licencia, cámbiala según tus necesidades.
-
-Licencia sugerida:
-```
-MIT License
-```
-
 ---
 
 ## 👤 Autores
@@ -65,10 +40,4 @@ Contacto: (añadir email o perfil)
 
 ---
 
-## 📝 Notas finales
-Si quieres, puedo:
-- Ajustar este README con contenido específico del proyecto (descripción real, clases, ejemplos concretos).
-- Generar un archivo LICENSE y contribute guidelines.
-- Crear scripts de compilación (Maven/Gradle) o un Dockerfile si lo deseas.
 
-¡Vamos a dejar este repositorio brillante y fácil de usar! ✨
