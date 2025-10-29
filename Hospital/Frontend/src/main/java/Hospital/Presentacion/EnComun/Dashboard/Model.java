@@ -4,7 +4,6 @@ import Hospital.Logic.Medicamentos;
 import Hospital.Logic.Prescripcion;
 import Hospital.Logic.Recetas;
 import Hospital.Logic.Service;
-import Hospital.data.*;
 import org.jfree.data.general.DefaultPieDataset;
 
 import org.jfree.data.category.DefaultCategoryDataset;
