@@ -144,21 +144,26 @@ public class Login extends JDialog  {
     }
 
     public boolean validateLogin() {
-       if (idTextField.getText().isEmpty()) {
-           JOptionPane.showMessageDialog(contentPane, "El id es obligatorio",
-                   "Error", JOptionPane.ERROR_MESSAGE);
-           return false;
-       }
-         if (passField.getPassword().length == 0) {
-             JOptionPane.showMessageDialog(contentPane, "La clave es obligatorio",
-                     "Error", JOptionPane.ERROR_MESSAGE);
-             return false;
-         }
+        if (controller == null) {
+            JOptionPane.showMessageDialog(contentPane, "Error de configuración del sistema",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if (idTextField.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(contentPane, "El id es obligatorio",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        if (passField.getPassword().length == 0) {
+            JOptionPane.showMessageDialog(contentPane, "La clave es obligatoria",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
         return true;
     }
 
     public Empleado take() {
-        Empleado e = new Empleado("" , "", "", "");
+        Empleado e = new Empleado();
         e.setId(idTextField.getText());
         e.setClave(new String(passField.getPassword()));
         return e;

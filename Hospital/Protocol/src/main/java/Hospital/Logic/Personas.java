@@ -1,6 +1,8 @@
 package Hospital.Logic;
 
-public abstract class Personas {
+import java.io.Serializable;
+
+public abstract class Personas implements Serializable {
     private String id;
     private String nombre;
 

@@ -1,10 +1,12 @@
 package Hospital.Logic;
 
-public class Empleado extends Personas {
+import java.io.Serializable;
+
+public class Empleado extends Personas implements Serializable {
     private String clave;
     private String rol;
 
-    protected Empleado() { super(); }
+    public Empleado() { super(); }
 
     public Empleado(String id, String nombre, String clave, String rol) {
         super(id, nombre);

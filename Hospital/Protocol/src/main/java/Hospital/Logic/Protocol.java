@@ -68,6 +68,9 @@ public class Protocol {
     public static final int ERROR_ALREADY_EXISTS = 4;
     public static final int ERROR_DATABASE = 5;
 
-    // Desconexión
+    // Misc
+    public static final int SYNC = 10;
+    public static final int ASYNC = 11;
     public static final int DISCONNECT = 99;
+    public static final int DELIVER_EMPLOYEE = 666;
 }

@@ -24,7 +24,7 @@ public class Service {
     private PrescripcionDao prescripcionDao;
 
 
-    private Service(){
+    Service(){
         try{
             administradorDao= new AdministradorDao();
             medicoDao= new MedicoDao();
