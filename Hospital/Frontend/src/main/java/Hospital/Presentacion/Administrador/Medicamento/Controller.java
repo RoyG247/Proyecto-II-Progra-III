@@ -38,6 +38,10 @@ public class Controller {
         model.setMode(Application.MODE_EDIT);
     }
 
+    public void switchMode(){
+        model.setMode(Application.MODE_CREATE);
+    }
+
     public void read(String codigo) throws Exception {
         Medicamentos e = new Medicamentos("","","");
         e.setCodigo(codigo);

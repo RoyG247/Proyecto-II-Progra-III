@@ -17,11 +17,16 @@ public class Service {
     private ObjectOutputStream out;
     private ObjectInputStream in;
 
+    String sid;
+
     private Service() {
         try {
             socket = new Socket(Protocol.SERVER, Protocol.PORT);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
+            out.writeInt(Protocol.SYNC);
+            out.flush();
+            sid = (String) in.readObject();
         } catch (Exception e) {
             System.exit(-1);
         }
@@ -485,7 +490,8 @@ public class Service {
         out.writeInt(Protocol.EMPLEADO_READ);
         out.writeObject(e);
         out.flush();
-        if (in.readInt() == Protocol.ERROR_NO_ERROR) {
+        int status = in.readInt();
+        if (status == Protocol.ERROR_NO_ERROR) {
             return (Empleado) in.readObject();
         }
         throw new Exception("EMPLEADO NO EXISTE");

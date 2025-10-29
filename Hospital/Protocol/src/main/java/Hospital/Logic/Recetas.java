@@ -1,9 +1,10 @@
 package Hospital.Logic;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Recetas {
+public class Recetas implements Serializable {
     int id;
     List<Prescripcion> prescripciones = new ArrayList<>();
     private Pacientes paciente;

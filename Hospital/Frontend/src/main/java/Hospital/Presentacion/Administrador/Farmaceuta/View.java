@@ -118,6 +118,7 @@ public class View implements PropertyChangeListener {
             public void actionPerformed(ActionEvent e) {
                 controller.clear();
                 textIdFarmaceuta.setEnabled(true);
+                controller.switchMode();
                 JOptionPane.showMessageDialog(panel, "Pantalla Limpia", "", JOptionPane.INFORMATION_MESSAGE);
             }
         });
@@ -130,6 +131,7 @@ public class View implements PropertyChangeListener {
                         controller.deleteFarmaceuta(n);
                         model.setList(controller.getFarmaceutas());
                         textIdFarmaceuta.setEnabled(true);
+                        controller.switchMode();
                         JOptionPane.showMessageDialog(panel, "Farmaceuta Eliminado", "", JOptionPane.INFORMATION_MESSAGE);
                     } catch (Exception ex) {
                         JOptionPane.showMessageDialog(panel, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

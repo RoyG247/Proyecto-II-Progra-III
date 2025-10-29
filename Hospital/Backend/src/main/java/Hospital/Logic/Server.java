@@ -38,10 +38,10 @@ public class Server {
                     case Protocol.SYNC :
                         sid = s.getRemoteSocketAddress().toString();
                         System.out.println("SYNCH " + sid);
-                        //worker = new Worker(this, s, os, is, sid, Service.instance());
-                        //workers.add(worker);
+                        worker = new Worker(this, s, os, is, sid, Service.instance());
+                        workers.add(worker);
                         System.out.println("Quedan " + workers.size() + " workers activos.");
-                        //worker.start();
+                        worker.start();
                         os.writeObject(sid);
                         break;
                     case Protocol.ASYNC:

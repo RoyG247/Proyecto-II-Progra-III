@@ -103,7 +103,7 @@ public class Application {
             public void stateChanged(ChangeEvent e) {
                     int index = tabbedPane.getSelectedIndex();
                     String titulo = tabbedPane.getTitleAt(index);
-                    if ("Histórico".equals(titulo)) {
+                    if ("Historico".equals(titulo)) {
                         viewHistorico.actualizarTablaRecetas();
                     }
             }
@@ -138,15 +138,15 @@ public class Application {
                 tabbedPane.addTab("Acerca de", viewAcercaDe.getPanel());
                 break;
             case "MED":
-                tabbedPane.addTab("Prescripción", viewPrescripcion.getPanel());
+                tabbedPane.addTab("Prescripcion", viewPrescripcion.getPanel());
                 tabbedPane.addTab("Dashboard", viewDashboard.getGrafico());
-                tabbedPane.addTab("Histórico", viewHistorico.getPanel());
+                tabbedPane.addTab("Historico", viewHistorico.getPanel());
                 tabbedPane.addTab("Acerca de", viewAcercaDe.getPanel());
                 break;
             case "FAR":
                 tabbedPane.addTab("Despacho", viewDespacho.getPanel());
                 tabbedPane.addTab("Dashboard", viewDashboard.getGrafico());
-                tabbedPane.addTab("Histórico", viewHistorico.getPanel());
+                tabbedPane.addTab("Historico", viewHistorico.getPanel());
                 tabbedPane.addTab("Acerca de", viewAcercaDe.getPanel());
 
                 break;

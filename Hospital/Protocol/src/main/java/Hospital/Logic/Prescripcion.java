@@ -1,6 +1,8 @@
 package Hospital.Logic;
 
-public class Prescripcion {
+import java.io.Serializable;
+
+public class Prescripcion implements Serializable {
     private int id;
     private Medicamentos medicamento;
     private String indicaciones;

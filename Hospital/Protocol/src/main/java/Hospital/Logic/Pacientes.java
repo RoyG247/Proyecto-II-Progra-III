@@ -1,8 +1,9 @@
 package Hospital.Logic;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public class Pacientes extends Personas{
+public class Pacientes extends Personas implements Serializable {
     private String numeroTelefono;
     private LocalDate fechaNacimiento;
 

@@ -123,6 +123,7 @@ public class View implements PropertyChangeListener {
             public void actionPerformed(ActionEvent e) {
                 controller.clear();
                 textCodigoMedicamento.setEnabled(true);
+                controller.switchMode();
                 JOptionPane.showMessageDialog(panel, "Pantalla Limpia", "", JOptionPane.INFORMATION_MESSAGE);
             }
         });
@@ -135,6 +136,7 @@ public class View implements PropertyChangeListener {
                     try {
                         controller.deleteMedicamento(n);
                         model.setList(controller.getMedicamentos());
+                        controller.switchMode();
                         JOptionPane.showMessageDialog(panel, "Medicamento Eliminado", "", JOptionPane.INFORMATION_MESSAGE);
                     } catch (Exception ex) {
                         JOptionPane.showMessageDialog(panel, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

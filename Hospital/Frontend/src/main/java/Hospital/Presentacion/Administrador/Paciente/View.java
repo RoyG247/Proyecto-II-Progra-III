@@ -126,6 +126,8 @@ public class View implements PropertyChangeListener {
             public void actionPerformed(ActionEvent e) {
                 controller.clear();
                 textIdPaciente.setEnabled(true);
+                controller.switchMode();
+
                 JOptionPane.showMessageDialog(panel, "Pantalla Limpia", "", JOptionPane.INFORMATION_MESSAGE);
             }
         });
@@ -138,6 +140,7 @@ public class View implements PropertyChangeListener {
                     try {
                         controller.deletePaciente(n);
                         model.setList(controller.getPacientes());
+                        controller.switchMode();
                         JOptionPane.showMessageDialog(panel, "Paciente Eliminado", "", JOptionPane.INFORMATION_MESSAGE);
                     } catch (Exception ex) {
                         JOptionPane.showMessageDialog(panel, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -170,6 +173,7 @@ public class View implements PropertyChangeListener {
                 }
             }
         });
+
     }
 
     public JPanel getPanel() {

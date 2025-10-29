@@ -50,6 +50,11 @@ public class Controller {
         model.setMode(Application.MODE_EDIT);
     }
 
+    public void switchMode(){
+      model.setMode(Application.MODE_CREATE);
+    }
+
+
     public void clear(){ model.setCurrent(new Pacientes());}
 
     public void deletePaciente(Pacientes e) throws Exception {

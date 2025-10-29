@@ -38,6 +38,10 @@ public class Controller {
         model.setMode(Application.MODE_EDIT);
     }
 
+    public void switchMode(){
+        model.setMode(Application.MODE_CREATE);
+    }
+
     public void read(String id) throws Exception {
         Farmaceuta e = new Farmaceuta();
         e.setId(id);
