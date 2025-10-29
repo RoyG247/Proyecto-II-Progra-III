@@ -27,10 +27,12 @@ public class Controller {
     }
 
     public void mostrarGraficoRecetas() {
+        model.refreshData();
         DefaultCategoryDataset dataset = model.getRecetasDatasetPorMesYMedicamentoOrdenado();
         view.mostrarGrafico(dataset);
     }
     public void mostrarPieChart() {
+        model.refreshData();
         DefaultPieDataset pieDataset = model.getEstadoRecetasDataset();
         view.mostrarPieChart(pieDataset);
     }
@@ -85,21 +87,25 @@ public class Controller {
     }
 
     public void cargarAniosActivos() {
+        model.refreshData();
         Set<Integer> anios = model.getAniosActivos();
         view.mostrarAniosEnCombo(anios);
     }
 
     public void cargarMesesActivos(){
+        model.refreshData();
         Set<String> meses = model.getMesesActivos();
         view.mostrarMesesEnCombo(meses);
     }
 
     public void cargarMedicamento() {
+        model.refreshData();
         List<Medicamentos> medicamentos = Service.instance().findAllMedicamentos();
         view.mostrarMedicamentosEnCombo(medicamentos);
     }
 
     public void actualizarTablaMedicamentos() {
+        model.refreshData();
         DefaultCategoryDataset dataset = model.getRecetasDatasetPorMesYMedicamentoOrdenado();
         TableModel tableModel = new TableModel(dataset);
         view.mostrarTabla(tableModel);

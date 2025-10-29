@@ -23,6 +23,10 @@ public class Model {
         recetas = Service.instance().findAllRecetas();
     }
 
+    public void refreshData() {
+        recetas = Service.instance().findAllRecetas();
+    }
+
     public List<Recetas> getRecords() {
         return recetas;
     }

@@ -125,6 +125,7 @@ public class View implements PropertyChangeListener {
 
     public void actualizarTablaRecetas() {
         int[] cols ={TableModel.MEDICO, TableModel.PACIENTE, TableModel.FECHARETIRO, TableModel.NUMERO};
+        controller.cargarHistorico();
         recetas.setModel(new TableModel(cols, model.getList()));
         panel.revalidate();
     }
