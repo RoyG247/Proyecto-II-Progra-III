@@ -73,7 +73,7 @@ public class Server {
     public void deliver_user(Worker from, Empleado e){
         for(Worker w : workers){
             if(w != from){
-                w.send_user(e);
+                w.deliver_login(e);
             }
         }
     }

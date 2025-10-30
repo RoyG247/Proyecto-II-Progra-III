@@ -41,6 +41,11 @@ public class Controller {
         if (!logged.getClave().equals(usuario.getClave()) || !logged.getId().equals(usuario.getId())) {
             throw new Exception("Clave o usuario incorrectos");
         }
+        try {
+            Service.instance().send_user(logged);
+        } catch (Exception e) {
+            throw new Exception("No se pudo establecer conexion con el servidor de mensajes");
+        }
         Sesion.setUsuario(logged);
     }
 

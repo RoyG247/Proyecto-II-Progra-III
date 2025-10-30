@@ -73,4 +73,5 @@ public class Protocol {
     public static final int ASYNC = 11;
     public static final int DISCONNECT = 99;
     public static final int DELIVER_EMPLOYEE = 666;
+    public static final int LOGIN = 44;
 }

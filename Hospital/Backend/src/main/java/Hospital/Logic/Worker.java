@@ -353,9 +353,12 @@ public class Worker {
                         try {
                             List<Medicamentos> lmed = service.findAllMedicamentos();
                             os.writeInt(Protocol.ERROR_NO_ERROR);
-                            os.writeObject(lmed);
+                            os.writeObject(lmed);  // Asegúrate de que lmed sea List<Medicamentos> y no List<Recetas>
+                            os.flush();  // Añade flush aquí
                         } catch (Exception ex) {
                             os.writeInt(Protocol.ERROR_ERROR);
+                            os.flush();
+                            ex.printStackTrace(); // Para debug
                         }
                         break;
 
@@ -434,11 +437,22 @@ public class Worker {
                         }
                         break;
 
+                    case Protocol.LOGIN:
+                        try {
+                            Empleado user = (Empleado) is.readObject();
+                            os.writeInt(Protocol.ERROR_NO_ERROR);
+                            srv.deliver_user(this, user);
+                        }catch (Exception ex) {
+                            os.writeInt(Protocol.ERROR_ERROR);
+                        }
+                        break;
+
                     case Protocol.DISCONNECT:
                         stop();
                         srv.remove(this);
                         break;
                 }
+
                 os.flush();
             } catch (IOException e) {
                 stop();
@@ -446,7 +460,7 @@ public class Worker {
         }
     }
 
-    public synchronized void send_user(Empleado e){
+    public synchronized void deliver_login(Empleado e){
         if (as != null){
             try {
                 aos.writeInt(Protocol.DELIVER_EMPLOYEE);

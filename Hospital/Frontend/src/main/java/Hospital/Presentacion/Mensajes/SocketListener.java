@@ -46,9 +46,9 @@ public class SocketListener {
                 switch (method) {
                     case Protocol.DELIVER_EMPLOYEE:
                         try {
-                            String message = (String) ais.readObject();
+                            Empleado user = (Empleado) ais.readObject();
                             SwingUtilities.invokeLater(new Runnable() {
-                                public void run() { listener.deliver_user(new Empleado());} });
+                                public void run() { listener.deliver_user(user);} });
                         } catch (ClassNotFoundException ex) {}
                         break;
                 }

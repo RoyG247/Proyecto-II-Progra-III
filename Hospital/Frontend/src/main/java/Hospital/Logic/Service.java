@@ -3,6 +3,7 @@ package Hospital.Logic;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Service {
@@ -407,7 +408,8 @@ public class Service {
             out.writeInt(Protocol.MEDICAMENTO_FIND_ALL);
             out.flush();
             if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-                return (List<Medicamentos>) in.readObject();
+                ArrayList<Medicamentos> meds = (ArrayList<Medicamentos>) in.readObject();
+                return meds;
             }
             return null;
         } catch (Exception e) {
@@ -442,9 +444,9 @@ public class Service {
             if (in.readInt() == Protocol.ERROR_NO_ERROR) {
                 return (List<Recetas>) in.readObject();
             }
-            return List.of();
+            return null;
         } catch (Exception e) {
-            return List.of();
+            return null;
         }
     }
 
@@ -504,6 +506,12 @@ public class Service {
         if (in.readInt() != Protocol.ERROR_NO_ERROR) {
             throw new Exception("ERROR AL ACTUALIZAR EMPLEADO");
         }
+    }
+
+    public void send_user(Empleado e) throws Exception {
+        out.writeInt(Protocol.LOGIN);
+        out.writeObject(e);
+        out.flush();
     }
 
     // =============== Desconexión ===============
