@@ -115,6 +115,28 @@ public class Controller {
         }
     }
 
+    public  Prescripcion getPrescripcionByNombre(String nombreMed) {
+        List<Prescripcion> prescripciones = model.getListPrescripciones();
+        for (Prescripcion p : prescripciones) {
+            if (p.getMedicamento() != null && nombreMed.equals(p.getMedicamento().getNombre())) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    public void updatePrescripcion(Prescripcion p) throws Exception {
+        Prescripcion current = model.getCurrentPrescripcion();
+        if (current != null) {
+            current.setCantidad(p.getCantidad());
+            current.setDuracion(p.getDuracion());
+            current.setIndicaciones(p.getIndicaciones());
+            current.setMedicamento(p.getMedicamento());
+        } else {
+            throw new Exception("No hay una prescripción seleccionada para actualizar.");
+        }
+    }
+
     public void clear() {
         model.setCurrent(new Recetas(null,null ,Sesion.getMedico()));
         model.setCurrentPrescripcion(null);

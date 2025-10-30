@@ -27,7 +27,7 @@ public class Controller {
                 Medico medico = new Medico();
                 medico.setId(logged.getId());
                 medico = Service.instance().read(medico);
-                logged.setNombre(medico.getNombre());
+                logged = medico;
                 break;
             case "FAR":
                 Farmaceuta farmaceuta = new Farmaceuta();
