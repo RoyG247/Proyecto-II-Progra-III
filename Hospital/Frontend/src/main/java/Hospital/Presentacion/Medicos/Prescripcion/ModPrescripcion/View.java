@@ -72,7 +72,8 @@ public class View extends JDialog implements java.beans.PropertyChangeListener {
                                 viewEditPrescripcion.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
                                 viewEditPrescripcion.setLocationRelativeTo(null);
                                 viewEditPrescripcion.pack();
-                                viewEditPrescripcion.show();
+                                viewEditPrescripcion.loadData();
+                                viewEditPrescripcion.setVisible(true);
                                 if (model.getCurrentPrescripcion() != null && model.getCurrentPrescripcion().isModificado()) {
                                     dispose();
                                 }

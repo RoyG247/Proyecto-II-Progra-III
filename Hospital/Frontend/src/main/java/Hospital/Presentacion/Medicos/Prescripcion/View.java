@@ -174,7 +174,8 @@ public class View implements PropertyChangeListener {
                         viewEditPrescripcion.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
                         viewEditPrescripcion.setLocationRelativeTo(null);
                         viewEditPrescripcion.pack();
-                        viewEditPrescripcion.show();
+                        viewEditPrescripcion.loadData();
+                        viewEditPrescripcion.setVisible(true);
                         if (model.getCurrentPrescripcion() != null) {
                             try {
                                 controller.updatePrescripcion(model.getCurrentPrescripcion());

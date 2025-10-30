@@ -65,12 +65,13 @@ public class view extends JDialog {
         super.setTitle(title);
     }
 
-    public void show() {
+    public void loadData() {
         Prescripcion p = model.getCurrentPrescripcion();
-        cantidadSpin.setValue(p.getCantidad());
-        duracionSpin.setValue(p.getDuracion());
-        indicacionesTxt.setText(p.getIndicaciones());
-        setVisible(true);
+        if(p.getCantidad() != 0 && p.getDuracion() != 0 && p.getIndicaciones() != null){
+            cantidadSpin.setValue(p.getCantidad());
+            duracionSpin.setValue(p.getDuracion());
+            indicacionesTxt.setText(p.getIndicaciones());
+        }
     }
 
     public boolean validateEdit() {
