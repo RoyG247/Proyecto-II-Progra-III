@@ -25,6 +25,7 @@ public class Model {
 
     public void refreshData() {
         recetas = Service.instance().findAllRecetas();
+
     }
 
     public List<Recetas> getRecords() {

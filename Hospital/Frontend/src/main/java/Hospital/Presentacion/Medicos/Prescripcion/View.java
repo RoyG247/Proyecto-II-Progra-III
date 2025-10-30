@@ -16,6 +16,7 @@ import java.time.LocalDate;
 
 public class View implements PropertyChangeListener {
     private Hospital.Presentacion.Medicos.Prescripcion.ModPrescripcion.View viewModPrescripcion = new Hospital.Presentacion.Medicos.Prescripcion.ModPrescripcion.View();
+    private Hospital.Presentacion.Medicos.Prescripcion.ModPrescripcion.editPrescripcion.view viewEditPrescripcion = new Hospital.Presentacion.Medicos.Prescripcion.ModPrescripcion.editPrescripcion.view();
     private JPanel GeneralPane;
     private DatePicker fechaRetiro;
     private JTable prescripciones;
@@ -167,13 +168,13 @@ public class View implements PropertyChangeListener {
                     Prescripcion p = controller.getPrescripcionByNombre(medicamentoNombre);
                     if (p != null) {
                         model.setCurrentPrescripcion(p);
-                        viewModPrescripcion.setController(controller);
-                        viewModPrescripcion.setModel(model);
-                        viewModPrescripcion.setResizable(false);
-                        viewModPrescripcion.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-                        viewModPrescripcion.setLocationRelativeTo(null);
-                        viewModPrescripcion.pack();
-                        viewModPrescripcion.setVisible(true);
+                        viewEditPrescripcion.setController(controller);
+                        viewEditPrescripcion.setModel(model);
+                        viewEditPrescripcion.setResizable(false);
+                        viewEditPrescripcion.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+                        viewEditPrescripcion.setLocationRelativeTo(null);
+                        viewEditPrescripcion.pack();
+                        viewEditPrescripcion.show();
                         if (model.getCurrentPrescripcion() != null) {
                             try {
                                 controller.updatePrescripcion(model.getCurrentPrescripcion());

@@ -75,6 +75,8 @@ public class Model extends AbstractModel{
     }
 
 
+
+
     public  Prescripcion getCurrentPrescripcion() {
         return currentPrescripcion;
     }

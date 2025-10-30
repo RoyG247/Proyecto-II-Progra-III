@@ -61,25 +61,29 @@ public class View extends JDialog implements java.beans.PropertyChangeListener {
                 int fila = tableMedicamentos.getSelectedRow();
                 if (fila >= 0) {
                     String id = (String) tableMedicamentos.getValueAt(fila, 0);
-                    try {
-                        controller.readMedicamentos(id);
-                        if(model.getCurrentPrescripcion().getMedicamento() != null) {
-                            viewEditPrescripcion.setController(controller);
-                            viewEditPrescripcion.setModel(model);
-                            viewEditPrescripcion.setTitle(model.getCurrentPrescripcion().getMedicamento().getNombre());
-                            viewEditPrescripcion.setResizable(false);
-                            viewEditPrescripcion.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-                            viewEditPrescripcion.setLocationRelativeTo(null);
-                            viewEditPrescripcion.pack();
-                            viewEditPrescripcion.setVisible(true);
-                            if (model.getCurrentPrescripcion() != null && model.getCurrentPrescripcion().isModificado()) {
-                                dispose();
+                    if (controller.medicamentoExists(id) == false) {
+                        try {
+                            controller.readMedicamentos(id);
+                            if (model.getCurrentPrescripcion().getMedicamento() != null) {
+                                viewEditPrescripcion.setController(controller);
+                                viewEditPrescripcion.setModel(model);
+                                viewEditPrescripcion.setTitle(model.getCurrentPrescripcion().getMedicamento().getNombre());
+                                viewEditPrescripcion.setResizable(false);
+                                viewEditPrescripcion.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+                                viewEditPrescripcion.setLocationRelativeTo(null);
+                                viewEditPrescripcion.pack();
+                                viewEditPrescripcion.show();
+                                if (model.getCurrentPrescripcion() != null && model.getCurrentPrescripcion().isModificado()) {
+                                    dispose();
+                                }
+                            } else {
+                                throw new Exception("No se ha podido cargar el medicamento");
                             }
-                        } else {
-                            throw new Exception("No se ha podido cargar el medicamento");
+                        } catch (Exception ex) {
+                            JOptionPane.showMessageDialog(tableMedicamentos, ex.getMessage(), "Información", JOptionPane.INFORMATION_MESSAGE);
                         }
-                    } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(tableMedicamentos, ex.getMessage(), "Información", JOptionPane.INFORMATION_MESSAGE);
+                    } else if (controller.medicamentoExists(id) == true) {
+                        JOptionPane.showMessageDialog(tableMedicamentos, "El medicamento ya ha sido añadido a la prescripción", "Información", JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
             }

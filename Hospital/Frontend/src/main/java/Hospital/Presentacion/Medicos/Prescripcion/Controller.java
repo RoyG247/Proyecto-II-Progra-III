@@ -77,6 +77,22 @@ public class Controller {
         }
     }
 
+    public boolean medicamentoExists(String codigo) {
+        Medicamentos m = new Medicamentos("","","");
+        m.setCodigo(codigo);
+        List<Prescripcion> list = model.getListPrescripciones();
+        try {
+            for(Prescripcion med : list) {
+                if(med.getMedicamento().getCodigo().equals(codigo)) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
+    }
+
     public void searchMedicamento(String id){
         Medicamentos m = new Medicamentos("","","");
         m.setCodigo(id);
@@ -123,6 +139,10 @@ public class Controller {
             }
         }
         return null;
+    }
+
+    public List<Prescripcion> getListPrescripciones() {
+        return model.getListPrescripciones();
     }
 
     public void updatePrescripcion(Prescripcion p) throws Exception {

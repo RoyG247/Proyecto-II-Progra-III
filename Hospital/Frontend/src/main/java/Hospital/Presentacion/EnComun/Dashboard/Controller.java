@@ -27,6 +27,9 @@ public class Controller {
     }
 
     public void mostrarGraficoRecetas() {
+        cargarAniosActivos();
+        cargarAniosActivos();
+        cargarMesesActivos();
         model.refreshData();
         DefaultCategoryDataset dataset = model.getRecetasDatasetPorMesYMedicamentoOrdenado();
         view.mostrarGrafico(dataset);

@@ -19,6 +19,8 @@ public class view extends JDialog {
 
     public view() {
         super((JFrame) null, "");
+        cantidadSpin.setModel(new SpinnerNumberModel(1, 1, 999, 1));
+        duracionSpin.setModel(new SpinnerNumberModel(1, 1, 365, 1));
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -47,6 +49,8 @@ public class view extends JDialog {
             }
         });
     }
+
+
     Controller controller;
     Model model;
     public void setController(Controller controller) {
@@ -59,6 +63,14 @@ public class view extends JDialog {
     @Override
     public void setTitle(String title) {
         super.setTitle(title);
+    }
+
+    public void show() {
+        Prescripcion p = model.getCurrentPrescripcion();
+        cantidadSpin.setValue(p.getCantidad());
+        duracionSpin.setValue(p.getDuracion());
+        indicacionesTxt.setText(p.getIndicaciones());
+        setVisible(true);
     }
 
     public boolean validateEdit() {
