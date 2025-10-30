@@ -1,6 +1,5 @@
 package Hospital.Presentacion.Medicos.Prescripcion;
 
-import Hospital.Logic.Medicamentos;
 import Hospital.Logic.Prescripcion;
 import Hospital.Logic.Recetas;
 import com.github.lgooddatepicker.components.DatePicker;
@@ -11,10 +10,8 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import Hospital.Presentacion.Medicos.Prescripcion.BuscarPaciente.*;
-import Hospital.Presentacion.Medicos.Prescripcion.TableModel;
+
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
 
 
 public class View implements PropertyChangeListener {
@@ -37,6 +34,7 @@ public class View implements PropertyChangeListener {
     private JLabel userLbl;
     private JLabel codeLbl;
     private JPanel recetaMedPane;
+    private JButton Modificar_Prescripcion;
     private Image backgroundImage;
     view viewBuscarPaciente = new view();
     //Implentar el boton para mostrar la vista de ModPrescripcion
@@ -156,6 +154,37 @@ public class View implements PropertyChangeListener {
                     } catch (Exception ex) {
                         JOptionPane.showMessageDialog(GeneralPane, ex.getMessage(), "Información", JOptionPane.INFORMATION_MESSAGE);
                     }
+                }
+            }
+        });
+
+        Modificar_Prescripcion.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = prescripciones.getSelectedRow();
+                if (row >= 0) {
+                    String medicamentoNombre = (String) prescripciones.getValueAt(row, TableModel.MEDICAMENTO);
+                    Prescripcion p = controller.getPrescripcionByNombre(medicamentoNombre);
+                    if (p != null) {
+                        model.setCurrentPrescripcion(p);
+                        viewModPrescripcion.setController(controller);
+                        viewModPrescripcion.setModel(model);
+                        viewModPrescripcion.setResizable(false);
+                        viewModPrescripcion.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+                        viewModPrescripcion.setLocationRelativeTo(null);
+                        viewModPrescripcion.pack();
+                        viewModPrescripcion.setVisible(true);
+                        if (model.getCurrentPrescripcion() != null) {
+                            try {
+                                controller.updatePrescripcion(model.getCurrentPrescripcion());
+                                actualizarTablaPrescripciones();
+                            }catch (Exception ex) {
+                                JOptionPane.showMessageDialog(GeneralPane, ex.getMessage(), "Información", JOptionPane.INFORMATION_MESSAGE);
+                            }
+                        }
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(GeneralPane, "Seleccione una prescripción para modificar.", "Información", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         });
