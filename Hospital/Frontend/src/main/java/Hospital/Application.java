@@ -40,15 +40,20 @@ public class Application {
 
     private static void doRun(){
         JFrame window = new JFrame();
+        Hospital.Presentacion.Mensajes.Model modelMensajes = new Hospital.Presentacion.Mensajes.Model();
+        Hospital.Presentacion.Mensajes.View viewMensajes = new Hospital.Presentacion.Mensajes.View();
+        Hospital.Presentacion.Mensajes.Controller controllerMensajes = new Hospital.Presentacion.Mensajes.Controller(viewMensajes, modelMensajes);
+
         JTabbedPane tabbedPane = new JTabbedPane();
-        window.setContentPane(tabbedPane);
-        window.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                super.windowClosing(e);
-                Service.instance().stop();
-            }
-        });
+
+        // Panel principal con BorderLayout
+        JPanel mainPanel = new JPanel(new BorderLayout());
+
+        // Agregar tabbedPane al centro y panel de mensajes a la derecha
+        mainPanel.add(tabbedPane, BorderLayout.CENTER);
+        mainPanel.add(viewMensajes.getPanel(), BorderLayout.EAST);
+
+        window.setContentPane(mainPanel);
 
         //Pestaña medicos
         Hospital.Presentacion.Administrador.Medicos.Model modelMedicos = new Hospital.Presentacion.Administrador.Medicos.Model();
@@ -154,7 +159,7 @@ public class Application {
                 break;
         }
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setSize(900, 600 );
+        window.setSize(1200, 600 );
         window.setResizable(false);
         window.setLocationRelativeTo(null);
         window.setVisible(true);
