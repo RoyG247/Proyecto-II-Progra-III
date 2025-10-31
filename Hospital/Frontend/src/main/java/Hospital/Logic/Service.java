@@ -1,22 +1,21 @@
 package Hospital.Logic;
 
+import Hospital.Presentacion.*; // (depend on project layout)
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 public class Service {
     private static Service theInstance;
 
-    public static Service instance() {
-        if (theInstance == null) theInstance = new Service();
-        return theInstance;
-    }
-
     private Socket socket;
     private ObjectOutputStream out;
     private ObjectInputStream in;
+
+    private final Object socketLock = new Object();
 
     String sid;
 
@@ -33,493 +32,428 @@ public class Service {
         }
     }
 
+    public static Service instance() {
+        if (theInstance == null) theInstance = new Service();
+        return theInstance;
+    }
+
+    public String getSid() {
+        return sid;
+    }
+
+
+    private Object sendRequestForObject(int code, Object payload){
+        try{
+            synchronized(socketLock){
+                System.out.println("FRONTEND - Enviando codigo solicitado: " + code + "payLoadClass: " + ((payload == null) ? "null" : payload.getClass().getName()));
+                out.writeInt(code);
+                if (payload != null){
+                    out.writeObject(payload);
+                }
+                out.flush();
+
+                int respCode = in.readInt();
+                System.out.println("FRONTEND - Codigo de respuesta recibido: " + respCode + "por: " + code);
+                if(respCode == Protocol.ERROR_NO_ERROR){
+                    Object obj = in.readObject();
+                    System.out.println("FRONTEND - Objeto recibido de clase: " + (obj == null ? "null" : obj.getClass().getName()));
+                    if (obj instanceof java.util.List){
+                        java.util.List list = (java.util.List) obj;
+                        System.out.println("FRONTEND - Tamaño de la lista recibida: " + list.size());
+                        if (!list.isEmpty() && list.get(0) != null){
+                            System.out.println("FRONTEND - Clase del primer elemento: " + list.get(0).getClass().getName());
+                        }
+                    }
+                    return obj;
+                } else {
+                    System.err.println("FRONTEND - server returned error code = " + respCode + " for request code: " + code);
+                    return null;
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("FRONTEND - server returned error code = ");
+            e.printStackTrace();
+            return null;
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void sendRequestNoObject(int code, Object payload) throws Exception {
+        try {
+            synchronized (socketLock) {
+                System.out.println("FRONTEND - Enviando codigo solicitado: " + code + "payloadClass: " +(payload == null ? "null" : payload.getClass().getName()));
+                out.writeInt(code);
+                if(payload != null){
+                    out.writeObject(payload);
+                }
+                out.flush();
+                int respCode = in.readInt();
+                System.out.println("FRONTEND - Codigo de respuesta recibido: " + respCode + "por: " + code);
+                if (respCode != Protocol.ERROR_NO_ERROR) {
+                    throw new Exception("ERROR DE SERVIDOR, CODIGO: " + respCode + "solicitado: " + code);
+                }
+            }
+
+        } catch (IOException ioEx) {
+            System.err.println("FRONTEND - IO Exception en sendRequestNoObject: " + ioEx.getMessage());
+            ioEx.printStackTrace();
+            throw ioEx;
+        }
+
+    }
+
+
     // =============== Administrador ===============
     public Administrador read(Administrador a) throws Exception {
-        out.writeInt(Protocol.ADMINISTRADOR_READ);
-        out.writeObject(a);
-        out.flush();
-        if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-            return (Administrador) in.readObject();
-        }
-        throw new Exception("ADMINISTRADOR NO EXISTE");
+      Object obj = sendRequestForObject(Protocol.ADMINISTRADOR_READ, a);
+      if(obj == null) throw new Exception("ADMINISTRADOR NO EXISTE");
+      try {
+            return (Administrador) obj;
+      } catch (ClassCastException ex) {
+          throw new Exception("Respuesta inesperada del servidor, el objeto no es de tipo Administrador" + obj.getClass().getName(), ex);
+
+      }
     }
 
     // =============== Médico ===============
     public void create(Medico m) throws Exception {
-        out.writeInt(Protocol.MEDICO_CREATE);
-        out.writeObject(m);
-        out.flush();
-        if (in.readInt() != Protocol.ERROR_NO_ERROR) {
-            throw new Exception("ERROR AL CREAR MÉDICO");
-        }
+        sendRequestNoObject(Protocol.MEDICO_CREATE, m);
     }
 
     public Medico read(Medico m) throws Exception {
-        out.writeInt(Protocol.MEDICO_READ);
-        out.writeObject(m);
-        out.flush();
-        if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-            return (Medico) in.readObject();
+        Object obj = sendRequestForObject(Protocol.MEDICO_READ, m);
+        if (obj == null) throw new Exception("MÉDICO NO EXISTE");
+        try {
+            return (Medico) obj;
+        } catch (ClassCastException ex) {
+            throw new Exception("Respuesta inesperada del servidor, el objeto no es de tipo Medico: " + obj.getClass().getName(), ex);
         }
-        throw new Exception("MÉDICO NO EXISTE");
     }
 
     public void update(Medico m) throws Exception {
-        out.writeInt(Protocol.MEDICO_UPDATE);
-        out.writeObject(m);
-        out.flush();
-        if (in.readInt() != Protocol.ERROR_NO_ERROR) {
-            throw new Exception("ERROR AL ACTUALIZAR MÉDICO");
-        }
+        sendRequestNoObject(Protocol.MEDICO_UPDATE, m);
     }
 
     public void Delete(Medico m) throws Exception {
-        out.writeInt(Protocol.MEDICO_DELETE);
-        out.writeObject(m);
-        out.flush();
-        if (in.readInt() != Protocol.ERROR_NO_ERROR) {
-            throw new Exception("ERROR AL ELIMINAR MÉDICO");
-        }
+        sendRequestNoObject(Protocol.MEDICO_DELETE, m);
     }
 
     public List<Medico> search(Medico m) {
+        Object obj = sendRequestForObject(Protocol.MEDICO_SEARCH, m);
+        if (obj == null) return List.of();
         try {
-            out.writeInt(Protocol.MEDICO_SEARCH);
-            out.writeObject(m);
-            out.flush();
-            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-                return (List<Medico>) in.readObject();
-            }
-            return List.of();
-        } catch (Exception e) {
-            return List.of();
+            return (List<Medico>) obj;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Respuesta inesperada del servidor, el objeto no es de tipo List<Medico>: " + obj.getClass().getName(), ex);
         }
     }
 
     public Medico searchId(Medico m) {
+        Object obj = sendRequestForObject(Protocol.MEDICO_SEARCH_ID, m);
+        if (obj == null) return null;
         try {
-            out.writeInt(Protocol.MEDICO_SEARCH_ID);
-            out.writeObject(m);
-            out.flush();
-            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-                return (Medico) in.readObject();
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
+            return (Medico) obj;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Respuesta inesperada del servidor, el objeto no es de tipo Medico: " + obj.getClass().getName(), ex);
         }
     }
 
     public List<Medico> searchIdFilt(Medico m) {
+        Object obj = sendRequestForObject(Protocol.MEDICO_SEARCH_ID_FILT, m);
+        if (obj == null) return List.of();
         try {
-            out.writeInt(Protocol.MEDICO_SEARCH_ID_FILT);
-            out.writeObject(m);
-            out.flush();
-            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-                return (List<Medico>) in.readObject();
-            }
-            return List.of();
-        } catch (Exception e) {
-            return List.of();
+            return (List<Medico>) obj;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Respuesta inesperada del servidor, el objeto no es de tipo List<Medico>: " + obj.getClass().getName(), ex);
         }
     }
 
     public List<Medico> findAllMedicos() {
+        Object obj = sendRequestForObject(Protocol.MEDICO_FIND_ALL, null);
+        if (obj == null) return List.of();
         try {
-            out.writeInt(Protocol.MEDICO_FIND_ALL);
-            out.flush();
-            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-                return (List<Medico>) in.readObject();
-            }
-            return List.of();
-        } catch (Exception e) {
-            return List.of();
+            return (List<Medico>) obj;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Respuesta inesperada del servidor, el objeto no es de tipo List<Medico>: " + obj.getClass().getName(), ex);
         }
     }
 
     // =============== Paciente ===============
     public void create(Pacientes p) throws Exception {
-        out.writeInt(Protocol.PACIENTE_CREATE);
-        out.writeObject(p);
-        out.flush();
-        if (in.readInt() != Protocol.ERROR_NO_ERROR) {
-            throw new Exception("ERROR AL CREAR PACIENTE");
-        }
+        sendRequestNoObject(Protocol.PACIENTE_CREATE, p);
     }
 
     public Pacientes read(Pacientes p) throws Exception {
-        out.writeInt(Protocol.PACIENTE_READ);
-        out.writeObject(p);
-        out.flush();
-        if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-            return (Pacientes) in.readObject();
+        Object obj = sendRequestForObject(Protocol.PACIENTE_READ, p);
+        if (obj == null) throw new Exception("PACIENTE NO EXISTE");
+        try {
+            return (Pacientes) obj;
+        } catch (ClassCastException ex) {
+            throw new Exception("Respuesta inesperada del servidor, el objeto no es de tipo Pacientes: " + obj.getClass().getName(), ex);
         }
-        return null;
     }
 
     public void update(Pacientes p) throws Exception {
-        out.writeInt(Protocol.PACIENTE_UPDATE);
-        out.writeObject(p);
-        out.flush();
-        if (in.readInt() != Protocol.ERROR_NO_ERROR) {
-            throw new Exception("ERROR AL ACTUALIZAR PACIENTE");
-        }
+        sendRequestNoObject(Protocol.PACIENTE_UPDATE, p);
     }
 
     public void Delete(Pacientes p) throws Exception {
-        out.writeInt(Protocol.PACIENTE_DELETE);
-        out.writeObject(p);
-        out.flush();
-        if (in.readInt() != Protocol.ERROR_NO_ERROR) {
-            throw new Exception("ERROR AL ELIMINAR PACIENTE");
-        }
+        sendRequestNoObject(Protocol.PACIENTE_DELETE, p);
     }
 
     public List<Pacientes> search(Pacientes p) {
+        Object obj = sendRequestForObject(Protocol.PACIENTE_SEARCH, p);
+        if (obj == null) return List.of();
         try {
-            out.writeInt(Protocol.PACIENTE_SEARCH);
-            out.writeObject(p);
-            out.flush();
-            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-                return (List<Pacientes>) in.readObject();
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
+            return (List<Pacientes>) obj;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Respuesta inesperada del servidor, el objeto no es de tipo List<Pacientes>: " + obj.getClass().getName(), ex);
         }
     }
 
     public Pacientes searchOne(Pacientes p) {
+        Object obj = sendRequestForObject(Protocol.PACIENTE_SEARCH_ONE, p);
+        if (obj == null) return null;
         try {
-            out.writeInt(Protocol.PACIENTE_SEARCH_ONE);
-            out.writeObject(p);
-            out.flush();
-            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-                return (Pacientes) in.readObject();
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
+            return (Pacientes) obj;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Respuesta inesperada del servidor, el objeto no es de tipo Pacientes: " + obj.getClass().getName(), ex);
         }
     }
 
     public List<Pacientes> searchId(Pacientes p) {
+        Object obj = sendRequestForObject(Protocol.PACIENTE_SEARCH_ID, p);
+        if (obj == null) return List.of();
         try {
-            out.writeInt(Protocol.PACIENTE_SEARCH_ID);
-            out.writeObject(p);
-            out.flush();
-            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-                return (List<Pacientes>) in.readObject();
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
+            return (List<Pacientes>) obj;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Respuesta inesperada del servidor, el objeto no es de tipo List<Pacientes>: " + obj.getClass().getName(), ex);
         }
     }
 
     public List<Pacientes> findAllPacientes() {
+        Object obj = sendRequestForObject(Protocol.PACIENTE_FIND_ALL, null);
+        if (obj == null) return List.of();
         try {
-            out.writeInt(Protocol.PACIENTE_FIND_ALL);
-            out.flush();
-            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-                return (List<Pacientes>) in.readObject();
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
+            return (List<Pacientes>) obj;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Respuesta inesperada del servidor, el objeto no es de tipo List<Pacientes>: " + obj.getClass().getName(), ex);
         }
     }
 
     // =============== Farmaceuta ===============
     public void create(Farmaceuta f) throws Exception {
-        out.writeInt(Protocol.FARMACEUTA_CREATE);
-        out.writeObject(f);
-        out.flush();
-        if (in.readInt() != Protocol.ERROR_NO_ERROR) {
-            throw new Exception("ERROR AL CREAR FARMACEUTA");
-        }
+        sendRequestNoObject(Protocol.FARMACEUTA_CREATE, f);
     }
 
     public Farmaceuta read(Farmaceuta f) throws Exception {
-        out.writeInt(Protocol.FARMACEUTA_READ);
-        out.writeObject(f);
-        out.flush();
-        if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-            return (Farmaceuta) in.readObject();
+        Object obj = sendRequestForObject(Protocol.FARMACEUTA_READ, f);
+        if (obj == null) throw new Exception("FARMACEUTA NO EXISTE");
+        try {
+            return (Farmaceuta) obj;
+        } catch (ClassCastException ex) {
+            throw new Exception("Respuesta inesperada del servidor, el objeto no es de tipo Farmaceuta: " + obj.getClass().getName(), ex);
         }
-        throw new Exception("FARMACEUTA NO EXISTE");
     }
 
     public void update(Farmaceuta f) throws Exception {
-        out.writeInt(Protocol.FARMACEUTA_UPDATE);
-        out.writeObject(f);
-        out.flush();
-        if (in.readInt() != Protocol.ERROR_NO_ERROR) {
-            throw new Exception("ERROR AL ACTUALIZAR FARMACEUTA");
-        }
+        sendRequestNoObject(Protocol.FARMACEUTA_UPDATE, f);
     }
 
     public void Delete(Farmaceuta f) throws Exception {
-        out.writeInt(Protocol.FARMACEUTA_DELETE);
-        out.writeObject(f);
-        out.flush();
-        if (in.readInt() != Protocol.ERROR_NO_ERROR) {
-            throw new Exception("ERROR AL ELIMINAR FARMACEUTA");
-        }
+        sendRequestNoObject(Protocol.FARMACEUTA_DELETE, f);
     }
 
     public List<Farmaceuta> search(Farmaceuta f) {
+        Object obj = sendRequestForObject(Protocol.FARMACEUTA_SEARCH, f);
+        if (obj == null) return List.of();
         try {
-            out.writeInt(Protocol.FARMACEUTA_SEARCH);
-            out.writeObject(f);
-            out.flush();
-            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-                return (List<Farmaceuta>) in.readObject();
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
+            return (List<Farmaceuta>) obj;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Respuesta inesperada del servidor, el objeto no es de tipo List<Farmaceuta>: " + obj.getClass().getName(), ex);
         }
     }
 
     public Farmaceuta searchId(Farmaceuta f) {
+        Object obj = sendRequestForObject(Protocol.FARMACEUTA_SEARCH_ID, f);
+        if (obj == null) return null;
         try {
-            out.writeInt(Protocol.FARMACEUTA_SEARCH_ID);
-            out.writeObject(f);
-            out.flush();
-            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-                return (Farmaceuta) in.readObject();
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
+            return (Farmaceuta) obj;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Respuesta inesperada del servidor, el objeto no es de tipo Farmaceuta: " + obj.getClass().getName(), ex);
         }
     }
 
     public List<Farmaceuta> searchIdFilt(Farmaceuta f) {
+        Object obj = sendRequestForObject(Protocol.FARMACEUTA_SEARCH_ID_FILT, f);
+        if (obj == null) return List.of();
         try {
-            out.writeInt(Protocol.FARMACEUTA_SEARCH_ID_FILT);
-            out.writeObject(f);
-            out.flush();
-            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-                return (List<Farmaceuta>) in.readObject();
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
+            return (List<Farmaceuta>) obj;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Respuesta inesperada del servidor, el objeto no es de tipo List<Farmaceuta>: " + obj.getClass().getName(), ex);
         }
     }
 
     public List<Farmaceuta> findAllFarmaceutas() {
+        Object obj = sendRequestForObject(Protocol.FARMACEUTA_FIND_ALL, null);
+        if (obj == null) return List.of();
         try {
-            out.writeInt(Protocol.FARMACEUTA_FIND_ALL);
-            out.flush();
-            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-                return (List<Farmaceuta>) in.readObject();
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
+            return (List<Farmaceuta>) obj;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Respuesta inesperada del servidor, el objeto no es de tipo List<Farmaceuta>: " + obj.getClass().getName(), ex);
         }
     }
 
     // =============== Medicamento ===============
     public void create(Medicamentos m) throws Exception {
-        out.writeInt(Protocol.MEDICAMENTO_CREATE);
-        out.writeObject(m);
-        out.flush();
-        if (in.readInt() != Protocol.ERROR_NO_ERROR) {
-            throw new Exception("ERROR AL CREAR MEDICAMENTO");
-        }
+        sendRequestNoObject(Protocol.MEDICAMENTO_CREATE, m);
     }
 
     public Medicamentos read(Medicamentos m) throws Exception {
-        out.writeInt(Protocol.MEDICAMENTO_READ);
-        out.writeObject(m);
-        out.flush();
-        if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-            return (Medicamentos) in.readObject();
+        Object obj = sendRequestForObject(Protocol.MEDICAMENTO_READ, m);
+        if (obj == null) throw new Exception("MEDICAMENTO NO EXISTE");
+        try {
+            return (Medicamentos) obj;
+        } catch (ClassCastException ex) {
+            throw new Exception("Respuesta inesperada del servidor, el objeto no es de tipo Medicamentos: " + obj.getClass().getName(), ex);
         }
-        throw new Exception("MEDICAMENTO NO EXISTE");
     }
 
     public void update(Medicamentos m) throws Exception {
-        out.writeInt(Protocol.MEDICAMENTO_UPDATE);
-        out.writeObject(m);
-        out.flush();
-        if (in.readInt() != Protocol.ERROR_NO_ERROR) {
-            throw new Exception("ERROR AL ACTUALIZAR MEDICAMENTO");
-        }
+        sendRequestNoObject(Protocol.MEDICAMENTO_UPDATE, m);
     }
 
     public void Delete(Medicamentos m) throws Exception {
-        out.writeInt(Protocol.MEDICAMENTO_DELETE);
-        out.writeObject(m);
-        out.flush();
-        if (in.readInt() != Protocol.ERROR_NO_ERROR) {
-            throw new Exception("ERROR AL ELIMINAR MEDICAMENTO");
-        }
+        sendRequestNoObject(Protocol.MEDICAMENTO_DELETE, m);
     }
 
     public List<Medicamentos> search(Medicamentos m) {
+        Object obj = sendRequestForObject(Protocol.MEDICAMENTO_SEARCH, m);
+        if (obj == null) return List.of();
         try {
-            out.writeInt(Protocol.MEDICAMENTO_SEARCH);
-            out.writeObject(m);
-            out.flush();
-            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-                return (List<Medicamentos>) in.readObject();
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
+            return (List<Medicamentos>) obj;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Respuesta inesperada del servidor, el objeto no es de tipo List<Medicamentos>: " + obj.getClass().getName(), ex);
         }
     }
 
     public List<Medicamentos> searchId(Medicamentos m) {
+        Object obj = sendRequestForObject(Protocol.MEDICAMENTO_SEARCH_ID, m);
+        if (obj == null) return List.of();
         try {
-            out.writeInt(Protocol.MEDICAMENTO_SEARCH_ID);
-            out.writeObject(m);
-            out.flush();
-            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-                return (List<Medicamentos>) in.readObject();
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
+            return (List<Medicamentos>) obj;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Respuesta inesperada del servidor, el objeto no es de tipo List<Medicamentos>: " + obj.getClass().getName(), ex);
         }
     }
 
     public Medicamentos searchOne(Medicamentos m) {
+        Object obj = sendRequestForObject(Protocol.MEDICAMENTO_SEARCH_ONE, m);
+        if (obj == null) return null;
         try {
-            out.writeInt(Protocol.MEDICAMENTO_SEARCH_ONE);
-            out.writeObject(m);
-            out.flush();
-            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-                return (Medicamentos) in.readObject();
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
+            return (Medicamentos) obj;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Respuesta inesperada del servidor, el objeto no es de tipo Medicamentos: " + obj.getClass().getName(), ex);
         }
     }
 
     public List<Medicamentos> findAllMedicamentos() {
+        Object obj = sendRequestForObject(Protocol.MEDICAMENTO_FIND_ALL, null);
+        if (obj == null) return List.of();
         try {
-            out.writeInt(Protocol.MEDICAMENTO_FIND_ALL);
-            out.flush();
-            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-                ArrayList<Medicamentos> meds = (ArrayList<Medicamentos>) in.readObject();
-                return meds;
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
+            return (List<Medicamentos>) obj;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Respuesta inesperada del servidor, el objeto no es de tipo List<Medicamentos>: " + obj.getClass().getName(), ex);
         }
     }
 
     // =============== Receta ===============
     public void create(Recetas r) throws Exception {
-        out.writeInt(Protocol.RECETA_CREATE);
-        out.writeObject(r);
-        out.flush();
-        if (in.readInt() != Protocol.ERROR_NO_ERROR) {
-            throw new Exception("ERROR AL CREAR RECETA");
-        }
+        sendRequestNoObject(Protocol.RECETA_CREATE, r);
     }
 
     public Recetas read(Recetas r) throws Exception {
-        out.writeInt(Protocol.RECETA_READ);
-        out.writeObject(r);
-        out.flush();
-        if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-            return (Recetas) in.readObject();
+        Object obj = sendRequestForObject(Protocol.RECETA_READ, r);
+        if (obj == null) throw new Exception("RECETA NO EXISTE");
+        try {
+            return (Recetas) obj;
+        } catch (ClassCastException ex) {
+            throw new Exception("Respuesta inesperada del servidor, el objeto no es de tipo Recetas: " + obj.getClass().getName(), ex);
         }
-        throw new Exception("RECETA NO EXISTE");
     }
 
     public List<Recetas> findAllRecetas() {
+        Object obj = sendRequestForObject(Protocol.RECETA_FIND_ALL, null);
+        if (obj == null) return List.of();
         try {
-            out.writeInt(Protocol.RECETA_FIND_ALL);
-            out.flush();
-            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-                return (List<Recetas>) in.readObject();
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
+            return (List<Recetas>) obj;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Respuesta inesperada del servidor, el objeto no es de tipo List<Recetas>: " + obj.getClass().getName(), ex);
         }
     }
 
     public List<Recetas> getRecetas() {
+        Object obj = sendRequestForObject(Protocol.RECETA_GET_RECETAS, null);
+        if (obj == null) return List.of();
         try {
-            out.writeInt(Protocol.RECETA_GET_RECETAS);
-            out.flush();
-            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-                return (List<Recetas>) in.readObject();
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
+            return (List<Recetas>) obj;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Respuesta inesperada del servidor, el objeto no es de tipo List<Recetas>: " + obj.getClass().getName(), ex);
         }
     }
 
     public List<Recetas> recetasPorPaciente(Recetas r) {
+        Object obj = sendRequestForObject(Protocol.RECETA_POR_PACIENTE, r);
+        if (obj == null) return List.of();
         try {
-            out.writeInt(Protocol.RECETA_POR_PACIENTE);
-            out.writeObject(r);
-            out.flush();
-            if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-                return (List<Recetas>) in.readObject();
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
+            return (List<Recetas>) obj;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Respuesta inesperada del servidor, el objeto no es de tipo List<Recetas>: " + obj.getClass().getName(), ex);
         }
     }
 
     public Recetas avanzarEstadoReceta(Recetas r) throws Exception {
-        out.writeInt(Protocol.RECETA_AVANZAR_ESTADO);
-        out.writeObject(r);
-        out.flush();
-        if (in.readInt() == Protocol.ERROR_NO_ERROR) {
-            return (Recetas) in.readObject();
+        Object obj = sendRequestForObject(Protocol.RECETA_AVANZAR_ESTADO, r);
+        if (obj == null) throw new Exception("ERROR AL AVANZAR ESTADO DE RECETA");
+        try {
+            return (Recetas) obj;
+        } catch (ClassCastException ex) {
+            throw new Exception("Respuesta inesperada del servidor, el objeto no es de tipo Recetas: " + obj.getClass().getName(), ex);
         }
-        throw new Exception("ERROR AL AVANZAR ESTADO");
     }
 
     // =============== Empleado ===============
     public Empleado read(Empleado e) throws Exception {
-        out.writeInt(Protocol.EMPLEADO_READ);
-        out.writeObject(e);
-        out.flush();
-        int status = in.readInt();
-        if (status == Protocol.ERROR_NO_ERROR) {
-            return (Empleado) in.readObject();
+        Object obj = sendRequestForObject(Protocol.EMPLEADO_READ, e);
+        if (obj == null) throw new Exception("EMPLEADO NO EXISTE");
+        try {
+            return (Empleado) obj;
+        } catch (ClassCastException ex) {
+            throw new Exception("Respuesta inesperada del servidor, el objeto no es de tipo Empleado: " + obj.getClass().getName(), ex);
         }
-        throw new Exception("EMPLEADO NO EXISTE");
     }
 
     public void update(Empleado e) throws Exception {
-        out.writeInt(Protocol.EMPLEADO_UPDATE);
-        out.writeObject(e);
-        out.flush();
-        if (in.readInt() != Protocol.ERROR_NO_ERROR) {
-            throw new Exception("ERROR AL ACTUALIZAR EMPLEADO");
-        }
+        sendRequestNoObject(Protocol.EMPLEADO_UPDATE, e);
     }
 
     public void send_user(Empleado e) throws Exception {
-        out.writeInt(Protocol.LOGIN);
-        out.writeObject(e);
-        out.flush();
+        sendRequestNoObject(Protocol.LOGIN, e);
     }
 
     // =============== Desconexión ===============
     private void disconnect() throws Exception {
-        out.writeInt(Protocol.DISCONNECT);
-        out.flush();
-        socket.shutdownOutput();
-        socket.close();
+        sendRequestNoObject(Protocol.DISCONNECT, null);
+        try {
+            if (out != null) out.close();
+        } catch (Exception e) {}
+        try {
+            if (in != null) in.close();
+        } catch (Exception e) {}
+        try {
+            if (socket != null) socket.close();
+        } catch (Exception e) {}
     }
 
     public void stop() {

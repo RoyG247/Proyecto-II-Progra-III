@@ -10,6 +10,7 @@ public class Model extends AbstractModel{
 
     public Model() {
         this.users = new ArrayList<>();
+        Empleado emp = new Empleado();
     }
 
 
