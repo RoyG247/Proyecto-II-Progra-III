@@ -15,6 +15,8 @@ public class Controller implements ThreadListener {
     public Controller(View viewMensajes, Model modelMensajes) {
         this.view = viewMensajes;
         this.model = modelMensajes;
+        view.setController(this);
+        view.setModel(model);
 
         try {
             socketListener = new SocketListener(this, ((Service)Service.instance()).getSid());

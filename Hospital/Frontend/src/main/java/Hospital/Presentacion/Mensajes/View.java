@@ -21,12 +21,32 @@ public class View implements PropertyChangeListener {
         return main1;
     }
 
+    Controller controller;
+    Model model;
+
+    public void setController(Controller controller) {
+        this.controller = controller;
+    }
+
+    public void setModel(Model model) {
+        this.model = model;
+        model.addPropertyChangeListener(this);
+    }
+
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         switch (evt.getPropertyName()) {
             case Model.USER_ONLINE:
                 Empleado usuario = (Empleado) evt.getNewValue();
-                prueba.setText("Usuario en línea: " + usuario.getNombre());
+                if (usuario != null) {
+                    prueba.setText("Usuario en línea: " + usuario.getNombre());
+                } else {
+                    break;
+                }
+                break;
+            default:
+                // Ignorar eventos no manejados
                 break;
         }
     }
