@@ -9,9 +9,11 @@ public class Model extends AbstractModel{
     Empleado currentUser;
     ArrayList<Empleado> users;
 
+    public static final String USER_ONLINE = "online";
+    public static final String USERS = "usuarios";
     public Model() {
         this.users = new ArrayList<>();
-        Empleado emp = new Empleado();
+        this.currentUser = new Empleado();
     }
 
 
@@ -23,6 +25,7 @@ public class Model extends AbstractModel{
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         super.addPropertyChangeListener(listener);
         firePropertyChange(USER_ONLINE);
+        firePropertyChange(USERS);
     }
 
     public void setCurrentUser(Empleado currentUser) {
@@ -36,8 +39,10 @@ public class Model extends AbstractModel{
     }
 
     public void setUsers(ArrayList<Empleado> users) {
+        ArrayList<Empleado> oldUsers = this.users;
         this.users = users;
+        firePropertyChange(USERS, oldUsers, users);
     }
 
-    public static final String USER_ONLINE = "online";
+
 }

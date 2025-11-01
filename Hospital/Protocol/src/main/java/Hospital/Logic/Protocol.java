@@ -59,6 +59,7 @@ public class Protocol {
     // Operaciones de Empleado
     public static final int EMPLEADO_READ = 701;
     public static final int EMPLEADO_UPDATE = 702;
+    public static final int EMPLEADO_MENSAJES = 703;
 
     // Códigos de error
     public static final int ERROR_NO_ERROR = 0;

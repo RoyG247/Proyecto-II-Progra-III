@@ -3,6 +3,8 @@ package Hospital.Presentacion.Mensajes;
 import Hospital.Logic.Empleado;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -31,6 +33,9 @@ public class View implements PropertyChangeListener {
     public void setModel(Model model) {
         this.model = model;
         model.addPropertyChangeListener(this);
+        if (this.controller != null) {
+            controller.cargarEmpleados();
+        }
     }
 
 
@@ -44,6 +49,23 @@ public class View implements PropertyChangeListener {
                 } else {
                     break;
                 }
+                break;
+            case Model.USERS:
+                int[] cols = {TableModel.ID, TableModel.BUTTON};
+                table1.setModel(new TableModel(cols, model.getUsers()) {
+                    @Override
+                    public Class<?> getColumnClass(int columnIndex) {
+                        if (columnIndex == 1) return Boolean.class;
+                        return super.getColumnClass(columnIndex);
+                    }
+
+                    @Override
+                    public boolean isCellEditable(int row, int column) {
+                        return column == 1;
+                    }
+                });
+
+                table1.setRowHeight(24);
                 break;
             default:
                 // Ignorar eventos no manejados

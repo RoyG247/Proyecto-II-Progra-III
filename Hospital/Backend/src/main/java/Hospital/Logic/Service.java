@@ -54,6 +54,12 @@ public class Service {
        return empleadoDao.read(p.getId());
     }
 
+    public List<Empleado> find_Empleados() throws Exception {
+        Empleado filter = new Empleado();
+        filter.setId("");
+        return empleadoDao.findByRol(filter);
+    }
+
     public void update(Empleado p) throws Exception {
         empleadoDao.update(p);
     }
