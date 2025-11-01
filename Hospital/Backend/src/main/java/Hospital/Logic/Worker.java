@@ -572,6 +572,19 @@ public class Worker {
                             os.writeInt(Protocol.ERROR_ERROR);
                         }
                         break;
+                    case Protocol.EMPLEADO_MENSAJES:
+                        System.out.println(">>> Tipo: EMPLEADO_FIND_ALL");
+                        try {
+                            List<Empleado> le = service.find_Empleados();
+                            System.out.println(">>> RESPUESTA: List tipo = " + (le != null ? le.getClass().getName() : "null"));
+                            System.out.println(">>> RESPUESTA: List size = " + (le != null ? le.size() : "null"));
+                            os.writeInt(Protocol.ERROR_NO_ERROR);
+                            os.writeObject(le);
+                        } catch (Exception ex) {
+                            System.out.println(">>> ERROR en EMPLEADO_FIND_ALL: " + ex.getMessage());
+                            os.writeInt(Protocol.ERROR_ERROR);
+                        }
+                        break;
                     case Protocol.EMPLEADO_UPDATE:
                         System.out.println(">>> Tipo: EMPLEADO_UPDATE");
                         try {

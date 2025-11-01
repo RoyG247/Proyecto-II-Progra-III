@@ -5,6 +5,9 @@ import Hospital.Logic.Service;
 import Hospital.Presentacion.ThreadListener;
 import Hospital.Presentacion.Sesion;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Controller implements ThreadListener {
 
     View view;
@@ -41,5 +44,7 @@ public class Controller implements ThreadListener {
         socketListener.stop();
     }
 
-
+    public void cargarEmpleados() {
+        model.setUsers((ArrayList<Empleado>) Service.instance().findAllEmpleados());
+    }
 }

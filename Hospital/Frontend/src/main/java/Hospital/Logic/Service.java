@@ -434,6 +434,16 @@ public class Service {
         }
     }
 
+    public List<Empleado> findAllEmpleados() {
+        Object obj = sendRequestForObject(Protocol.EMPLEADO_MENSAJES, null);
+        if (obj == null) return List.of();
+        try {
+            return (List<Empleado>) obj;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Respuesta inesperada del servidor, el objeto no es de tipo List<Empleado>: " + obj.getClass().getName(), ex);
+        }
+    }
+
     public void update(Empleado e) throws Exception {
         sendRequestNoObject(Protocol.EMPLEADO_UPDATE, e);
     }
