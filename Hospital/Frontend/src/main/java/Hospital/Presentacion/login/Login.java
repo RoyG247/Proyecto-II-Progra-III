@@ -31,11 +31,11 @@ public class Login extends JDialog  {
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setResizable(false);
 
-        ImageIcon backgroundIcon = new ImageIcon("resources/Hospital-Medico.png");
+        ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/Hospital-Medico.png"));
         backgroundImage = backgroundIcon.getImage().getScaledInstance(250, 500, Image.SCALE_SMOOTH);
         bklbl.setIcon(new ImageIcon(backgroundImage));
 
-        ImageIcon icon = new ImageIcon("Resources/loginIco2.png");
+        ImageIcon icon = new ImageIcon(getClass().getResource("/loginIco2.png"));
         Image img = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
         loginIco.setIcon(new ImageIcon(img));
 

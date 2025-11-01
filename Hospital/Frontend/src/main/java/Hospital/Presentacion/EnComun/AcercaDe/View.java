@@ -9,7 +9,7 @@ public class View {
     private Image backgroundImage;
 
     public View() {
-        ImageIcon backgroundIcon = new ImageIcon("resources/fondoHospital.png");
+        ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/fondoHospital.png"));
         backgroundImage = backgroundIcon.getImage().getScaledInstance(900, 400, Image.SCALE_SMOOTH);
         bckLbl.setIcon(new ImageIcon(backgroundImage));
     }

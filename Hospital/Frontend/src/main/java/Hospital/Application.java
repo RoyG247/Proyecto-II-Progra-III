@@ -33,6 +33,8 @@ public class Application {
         Hospital.Presentacion.login.Login view = new Hospital.Presentacion.login.Login();
         view.setTitle("Login");
         view.pack();
+        ImageIcon icon = new ImageIcon(Application.class.getResource("/hospitalMain.png"));
+        view.setIconImage(icon.getImage());
         view.setLocationRelativeTo(null);
         Hospital.Presentacion.login.Controller controller = new Hospital.Presentacion.login.Controller(view, model);
         view.setVisible(true);
@@ -132,6 +134,8 @@ public class Application {
         });
 
         window.setTitle("Despacho de Recetas - " + Sesion.getUsuario().getNombre() + " (" + Sesion.getUsuario().getRol() + ")");
+        ImageIcon icon = new ImageIcon(Application.class.getResource("/hospitalMain.png"));
+        window.setIconImage(icon.getImage());
         switch (Sesion.getUsuario().getRol()) {
             case "ADM":
                 tabbedPane.addTab("Médicos", viewMedicos.getPanel());

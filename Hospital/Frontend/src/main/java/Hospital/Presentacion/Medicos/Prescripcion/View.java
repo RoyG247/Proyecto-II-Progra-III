@@ -43,8 +43,7 @@ public class View implements PropertyChangeListener {
 
     public View(){
         fechaRetiro.setDate(LocalDate.now());
-        ImageIcon backgroundIcon = new ImageIcon("resources/receta.png");
-        backgroundImage = backgroundIcon.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+        ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/receta.png"));        backgroundImage = backgroundIcon.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
         iconLbl.setIcon(new ImageIcon(backgroundImage));
         controlPane.setOpaque(false);
         RecetaPane.setOpaque(false);

@@ -31,8 +31,7 @@ public class View implements PropertyChangeListener {
     private Image backgroundImage;
 
     public View() {
-
-        ImageIcon backgroundIcon = new ImageIcon("resources/pacienteIco.png");
+        ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/pacienteIco.png"));
         backgroundImage = backgroundIcon.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
         iconLbl.setIcon(new ImageIcon(backgroundImage));
         controlPane.setBorder(new javax.swing.border.AbstractBorder() {
