@@ -10,102 +10,103 @@ import java.util.Collections;
 import java.util.List;
 
 public class Server {
-    ServerSocket ss;
+    ServerSocket srv;
     List<Worker> workers;
     List<Empleado> empleados;
+    Service service;
 
-    public Server(){
+    public Server() {
         try {
-            ss = new ServerSocket(Protocol.PORT);
-            workers = Collections.synchronizedList(new ArrayList<Worker>());
-            empleados = Collections.synchronizedList(new ArrayList<Empleado>());
-            System.out.println("Server Started");
-        } catch (IOException ex) { System.out.println(ex); }
+            srv = new ServerSocket(Protocol.PORT);
+            workers = Collections.synchronizedList(new ArrayList<>());
+            empleados = Collections.synchronizedList(new ArrayList<>());
+            service = Service.instance();
+            System.out.println("Servidor iniciado...");
+        } catch (IOException ex) {
+            System.exit(-1);
+        }
+    }
+
+    public void remove(Worker worker, Empleado empleado) {
+        workers.remove(worker);
+        empleados.remove(empleado);
+        for (Worker w : workers) {
+            w.deliver_users(empleados);
+        }
     }
 
     public void run() {
-        Service service = new Service();
-        boolean running = true;
-        Socket s;
+        boolean continuar = true;
+        ObjectOutputStream oos;
+        ObjectInputStream ois;
+        Socket socket;
         Worker worker;
-        String sid;
-        while (running){
+
+        while (continuar) {
             try {
-                s = ss.accept();
-                System.out.println("Cliente conectado: " + s.getInetAddress().getHostAddress());
-                ObjectOutputStream os = new ObjectOutputStream(s.getOutputStream());
-                ObjectInputStream is = new ObjectInputStream(s.getInputStream());
-                int type = is.readInt();
-                switch (type){
-                    case Protocol.SYNC :
-                        sid = s.getRemoteSocketAddress().toString();
-                        System.out.println("SYNCH " + sid);
-                        worker = new Worker(this, s, os, is, sid, Service.instance());
+                socket = srv.accept();
+                ois = new ObjectInputStream(socket.getInputStream());
+                oos = new ObjectOutputStream(socket.getOutputStream());
+
+                int method = ois.readInt();
+                switch (method) {
+                    case Protocol.SYNC:
+                        String sid = "Usr-" + (workers.size() + 1);
+                        oos.writeObject(sid);
+                        oos.flush();
+                        worker = new Worker(this, socket, oos, ois, sid, service);
                         workers.add(worker);
-                        System.out.println("Quedan " + workers.size() + " workers activos.");
                         worker.start();
-                        os.writeObject(sid);
                         break;
                     case Protocol.ASYNC:
-                        sid = (String) is.readObject();
-                        System.out.println("ASYNCH " + sid);
-                        join(s,os,is,sid);
+                        sid = (String) ois.readObject();
+                        for (Worker w : workers) {
+                            if (w.sid.equals(sid)) {
+                                w.setAs(socket, oos, ois);
+                                break;
+                            }
+                        }
                         break;
                 }
-                os.flush();
-            } catch (IOException | ClassNotFoundException ex) {
-                System.out.println(ex);
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
     }
 
-    public void remove(Worker w){
-        workers.remove(w);
-        System.out.println("Quedan " + workers.size() + " workers activos.");
-    }
 
-    public void join(Socket as,ObjectOutputStream aos, ObjectInputStream ais, String sid){
-        for(Worker w : workers){
-            if(w.sid.equals(sid)){
-                w.setAs(as, aos, ais);
-            }
-        }
-    }
 
-    public void deliver_user(Worker from, Empleado e){
-        for(Worker w : workers){
-            if(w != from){
-                w.deliver_login(e);
-            }
-        }
-    }
     public void deliver_users(Worker from, Empleado e) {
         empleados.add(e);
-        List<Empleado> result = new ArrayList<>();
-        List<Empleado> result2 = new ArrayList<>();
+        Empleado nuevoUsuario = new Empleado();
+        nuevoUsuario.setId(e.getId());
+        nuevoUsuario.setNombre(e.getNombre());
+        nuevoUsuario.setRol(e.getRol());
+
         for (Worker w : workers) {
             if (w != from) {
-                result.add(e);
-                w.deliver_users(result);
+                w.deliver_login(nuevoUsuario);
             }
         }
 
-        if(from != null){
-            for(Empleado emp : empleados){
-                if(emp != e){
-                    result2.add(emp);
+        if (from != null) {
+            List<Empleado> usuariosConectados = new ArrayList<>();
+            for (Empleado emp : empleados) {
+                if (!emp.getId().equals(e.getId())) {
+                    usuariosConectados.add(emp);
                 }
             }
-            from.deliver_users(result2);
+            from.deliver_users(usuariosConectados);
         }
-
     }
 
-    public void deliver_message(Worker from, String message){
-        for(Worker w : workers){
-            if(w != from){
+    public void deliver_message(Worker from, String message) {
+        for (Worker w : workers) {
+            if (w != from) {
                 w.deliver_message(message);
             }
         }
     }
+
+
 }

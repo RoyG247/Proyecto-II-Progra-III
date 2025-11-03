@@ -442,6 +442,16 @@ public class Service {
         }
     }
 
+    public List<Empleado> findAllOnlineUsers(){
+        Object obj = sendRequestForObject(Protocol.EMPLEADO_ONLINE, null);
+        if (obj == null) return List.of();
+        try {
+            return (List<Empleado>) obj;
+        } catch (ClassCastException ex) {
+            throw new RuntimeException("Respuesta inesperada del servidor, el objeto no es de tipo List<Empleado>: " + obj.getClass().getName(), ex);
+        }
+    }
+
     public void update(Empleado e) throws Exception {
         sendRequestNoObject(Protocol.EMPLEADO_UPDATE, e);
     }
@@ -449,30 +459,26 @@ public class Service {
     public void send_user(Empleado e) throws Exception {
         sendRequestNoObject(Protocol.LOGIN, e);
     }
+    public void receive_users() throws Exception {
+        //sendRequestNoObject(Protocol.RECEIVE_USERS, null);
+    }
 
     public void send_message(int e , String msg) throws Exception {
         sendRequestNoObject(Protocol.DELIVER_MESSAGE, msg);
     }
 
-    // =============== Desconexión ===============
-    private void disconnect() throws Exception {
-        sendRequestNoObject(Protocol.DISCONNECT, null);
+    public void stop(Empleado emp) {
         try {
-            if (out != null) out.close();
-        } catch (Exception e) {}
-        try {
-            if (in != null) in.close();
-        } catch (Exception e) {}
-        try {
-            if (socket != null) socket.close();
-        } catch (Exception e) {}
+            disconnect(emp);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-   public void stop() {
-        try {
-            disconnect();
-        } catch (Exception e) {
-            System.exit(-1);
-       }
-   }
+    private void disconnect(Empleado emp) throws Exception {
+        sendRequestNoObject(Protocol.DISCONNECT, emp);
+        if (out != null) out.close();
+        if (in != null) in.close();
+        if (socket != null && !socket.isClosed()) socket.close();
+    }
 }

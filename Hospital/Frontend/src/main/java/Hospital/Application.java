@@ -61,8 +61,13 @@ public class Application {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
-                controllerMensajes.stop();
-                Service.instance().stop();
+                try {
+                    controllerMensajes.stop();
+                    Service.instance().stop(Sesion.getUsuario());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                System.exit(0);
             }
         });
 

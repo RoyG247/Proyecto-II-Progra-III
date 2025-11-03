@@ -46,6 +46,11 @@ public class Model extends AbstractModel{
         firePropertyChange(USERS, oldUsers, users);
     }
 
+    public void addUser(Empleado user) {
+        this.users.add(user);
+        firePropertyChange(USERS, null, this.users);
+    }
+
     public String getMessage() {
         return message;
     }

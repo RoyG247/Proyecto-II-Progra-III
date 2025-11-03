@@ -596,15 +596,30 @@ public class Worker {
                         }
                         break;
 
+                    case Protocol.EMPLEADO_ONLINE:
+                        System.out.println(">>> Tipo: EMPLEADO_ONLINE");
+                        try {
+                            List<Empleado> le = srv.empleados;
+                            System.out.println(">>> RESPUESTA: List tipo = " + (le != null ? le.getClass().getName() : "null"));
+                            System.out.println(">>> RESPUESTA: List size = " + (le != null ? le.size() : "null"));
+                            os.writeInt(Protocol.ERROR_NO_ERROR);
+                            os.writeObject(le);
+                        } catch (Exception ex) {
+                            System.out.println(">>> ERROR en EMPLEADO_ONLINE: " + ex.getMessage());
+                            os.writeInt(Protocol.ERROR_ERROR);
+                        }
+                        break;
+
                     case Protocol.LOGIN:
                         System.out.println(">>> Tipo: LOGIN");
                         try {
                             Empleado user = (Empleado) is.readObject();
                             System.out.println(">>> Usuario recibido: " + user.getClass().getName());
                             os.writeInt(Protocol.ERROR_NO_ERROR);
-                            srv.deliver_user(this, user);
+                            os.flush();
+                            // Enviar información de usuarios conectados al nuevo usuario
                             srv.deliver_users(this, user);
-                        }catch (Exception ex) {
+                        } catch (Exception ex) {
                             System.out.println(">>> ERROR en LOGIN: " + ex.getMessage());
                             os.writeInt(Protocol.ERROR_ERROR);
                         }
@@ -626,12 +641,17 @@ public class Worker {
                     case Protocol.DISCONNECT:
                         try {
                             System.out.println(">>> Tipo: DISCONNECT");
-                            srv.remove(this);
-                            stop();
+                            Empleado user = (Empleado) is.readObject();
                             os.writeInt(Protocol.ERROR_NO_ERROR);
-                        }catch (Exception ex) {
+                            os.flush();
+                            stop();
+                            srv.remove(this, user);
+                        } catch (Exception ex) {
                             System.out.println(">>> ERROR en DISCONNECT: " + ex.getMessage());
-                            os.writeInt(Protocol.ERROR_ERROR);
+                            try {
+                                os.writeInt(Protocol.ERROR_ERROR);
+                                os.flush();
+                            } catch (IOException ignored) {}
                         }
                         break;
 
