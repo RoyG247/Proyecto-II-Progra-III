@@ -16,6 +16,15 @@ public class Worker {
     Socket as; // Asynchronous Socket
     ObjectOutputStream aos;
     ObjectInputStream ais;
+    private Empleado empleadoAsociado;
+
+    public Empleado getEmpleadoAsociado() {
+        return empleadoAsociado;
+    }
+
+    public void setEmpleadoAsociado(Empleado empleado) {
+        this.empleadoAsociado = empleado;
+    }
 
     public Worker(Server srv, Socket s, ObjectOutputStream os, ObjectInputStream is, String sid, Service service) {
         this.srv = srv;
@@ -599,7 +608,8 @@ public class Worker {
                     case Protocol.EMPLEADO_ONLINE:
                         System.out.println(">>> Tipo: EMPLEADO_ONLINE");
                         try {
-                            List<Empleado> le = srv.empleados;
+                            Empleado e = (Empleado) is.readObject();
+                            List<Empleado> le = srv.filtrarEmpleadosExternos(e);
                             System.out.println(">>> RESPUESTA: List tipo = " + (le != null ? le.getClass().getName() : "null"));
                             System.out.println(">>> RESPUESTA: List size = " + (le != null ? le.size() : "null"));
                             os.writeInt(Protocol.ERROR_NO_ERROR);

@@ -27,14 +27,6 @@ public class Server {
         }
     }
 
-    public void remove(Worker worker, Empleado empleado) {
-        workers.remove(worker);
-        empleados.remove(empleado);
-        for (Worker w : workers) {
-            w.deliver_users(empleados);
-        }
-    }
-
     public void run() {
         boolean continuar = true;
         ObjectOutputStream oos;
@@ -74,30 +66,52 @@ public class Server {
         }
     }
 
-
-
     public void deliver_users(Worker from, Empleado e) {
         empleados.add(e);
-        Empleado nuevoUsuario = new Empleado();
-        nuevoUsuario.setId(e.getId());
-        nuevoUsuario.setNombre(e.getNombre());
-        nuevoUsuario.setRol(e.getRol());
+        from.setEmpleadoAsociado(e);
 
         for (Worker w : workers) {
             if (w != from) {
+                Empleado nuevoUsuario = new Empleado();
+                nuevoUsuario.setId(e.getId());
+                nuevoUsuario.setNombre(e.getNombre());
+                nuevoUsuario.setRol(e.getRol());
                 w.deliver_login(nuevoUsuario);
             }
         }
 
         if (from != null) {
-            List<Empleado> usuariosConectados = new ArrayList<>();
-            for (Empleado emp : empleados) {
-                if (!emp.getId().equals(e.getId())) {
-                    usuariosConectados.add(emp);
-                }
-            }
+            List<Empleado> usuariosConectados = filtrarEmpleadosExternos(e);
             from.deliver_users(usuariosConectados);
         }
+    }
+
+
+    public void remove(Worker worker, Empleado empleado) {
+        workers.remove(worker);
+        empleados.remove(empleado);
+
+        for (Worker w : workers) {
+            Empleado empleadoActual = w.getEmpleadoAsociado();
+            List<Empleado> usuariosConectados = filtrarEmpleadosExternos(empleadoActual);
+            w.deliver_users(usuariosConectados);
+        }
+    }
+
+    public List<Empleado> filtrarEmpleadosExternos(Empleado empleadoActual) {
+        List<Empleado> usuariosConectados = new ArrayList<>();
+
+        if (empleadoActual == null) {
+            return new ArrayList<>(empleados);
+        }
+
+        for (Empleado emp : empleados) {
+            if (!emp.getId().equals(empleadoActual.getId())) {
+                usuariosConectados.add(emp);
+            }
+        }
+
+        return usuariosConectados;
     }
 
     public void deliver_message(Worker from, String message) {

@@ -38,7 +38,7 @@ public class Controller implements ThreadListener {
 
     public void cargarEmpleados() {
         try {
-            List<Empleado> empleados = Service.instance().findAllOnlineUsers();
+            List<Empleado> empleados = Service.instance().findAllOnlineUsers(Sesion.getUsuario());
             model.setUsers(new ArrayList<>(empleados));
         } catch (Exception e) {
             e.printStackTrace();

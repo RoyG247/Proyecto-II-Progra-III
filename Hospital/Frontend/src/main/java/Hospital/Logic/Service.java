@@ -442,8 +442,8 @@ public class Service {
         }
     }
 
-    public List<Empleado> findAllOnlineUsers(){
-        Object obj = sendRequestForObject(Protocol.EMPLEADO_ONLINE, null);
+    public List<Empleado> findAllOnlineUsers(Empleado emp){
+        Object obj = sendRequestForObject(Protocol.EMPLEADO_ONLINE, emp);
         if (obj == null) return List.of();
         try {
             return (List<Empleado>) obj;
