@@ -55,9 +55,16 @@ public class Controller implements ThreadListener {
         model.setCurrentMessage(null);
     }
 
-    public Mensaje message() {
-        return model.getCurrentmessage();
+    public String getUserNameById(String id) {
+        for (Empleado user : model.getUsers()) {
+            if (user.getId().equals(id)) {
+                return user.getNombre();
+            }
+        }
+        return "Desconocido";
     }
+
+
 
     // Implementación de ThreadListener
     @Override

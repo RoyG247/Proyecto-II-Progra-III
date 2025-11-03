@@ -49,6 +49,7 @@ public class Model extends AbstractModel{
         return users;
     }
 
+
     public void setUsers(ArrayList<Empleado> users) {
         ArrayList<Empleado> oldUsers = this.users;
         this.users = users;
