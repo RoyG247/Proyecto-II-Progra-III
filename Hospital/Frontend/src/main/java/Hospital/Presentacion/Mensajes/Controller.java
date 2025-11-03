@@ -3,7 +3,6 @@ package Hospital.Presentacion.Mensajes;
 import Hospital.Logic.Empleado;
 import Hospital.Logic.Service;
 import Hospital.Presentacion.ThreadListener;
-import Hospital.Presentacion.Sesion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,11 +39,39 @@ public class Controller implements ThreadListener {
         }
     }
 
+    @Override
+    public void deliver_users(List<Empleado> users) {
+        try {
+            model.setUsers((ArrayList<Empleado>) users);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void deliver_message(String message) {
+        try {
+            model.setMessage(message);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public String message(){
+        return model.getMessage();
+    }
+    public void send_message(int e, String message) {
+        try {
+            Service.instance().send_message(e, message);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
     public void stop(){
         socketListener.stop();
     }
 
-    public void cargarEmpleados() {
-        model.setUsers((ArrayList<Empleado>) Service.instance().findAllEmpleados());
+    public void cargarEmpleados(){
+        model.setUsers(model.getUsers());
     }
 }

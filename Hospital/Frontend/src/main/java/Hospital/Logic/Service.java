@@ -1,12 +1,10 @@
 package Hospital.Logic;
 
-import Hospital.Presentacion.*; // (depend on project layout)
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.List;
-import java.util.ArrayList;
 
 public class Service {
     private static Service theInstance;
@@ -452,6 +450,10 @@ public class Service {
         sendRequestNoObject(Protocol.LOGIN, e);
     }
 
+    public void send_message(int e , String msg) throws Exception {
+        sendRequestNoObject(Protocol.DELIVER_MESSAGE, msg);
+    }
+
     // =============== Desconexión ===============
     private void disconnect() throws Exception {
         sendRequestNoObject(Protocol.DISCONNECT, null);
@@ -466,11 +468,11 @@ public class Service {
         } catch (Exception e) {}
     }
 
-    public void stop() {
+   public void stop() {
         try {
             disconnect();
         } catch (Exception e) {
             System.exit(-1);
-        }
-    }
+       }
+   }
 }

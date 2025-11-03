@@ -55,6 +55,15 @@ public class Application {
 
         window.setContentPane(mainPanel);
 
+        window.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+                controllerMensajes.stop();
+                Service.instance().stop();
+            }
+        });
+
         //Pestaña medicos
         Hospital.Presentacion.Administrador.Medicos.Model modelMedicos = new Hospital.Presentacion.Administrador.Medicos.Model();
         Hospital.Presentacion.Administrador.Medicos.View viewMedicos = new Hospital.Presentacion.Administrador.Medicos.View();
