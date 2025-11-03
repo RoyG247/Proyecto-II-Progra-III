@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.List;
 
 public class SocketListener {
     ThreadListener listener;
@@ -51,8 +52,21 @@ public class SocketListener {
                                 public void run() { listener.deliver_user(user);} });
                         } catch (ClassNotFoundException ex) {}
                         break;
-                }
-            } catch (IOException ex) { condition = false; }
+                    case Protocol.DELIVER_EMPLOYEES:
+                        try {
+                            List<Empleado> users = (List<Empleado>) ais.readObject();
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() { listener.deliver_users(users); } });
+                        } catch (ClassNotFoundException ex) {}
+                        break;
+                        case Protocol.DELIVER_MESSAGE:
+                        try {
+                            String message = (String) ais.readObject();
+                            SwingUtilities.invokeLater(new Runnable() {
+                                public void run() { listener.deliver_message(message); } });
+                        } catch (ClassNotFoundException ex) {}
+                            }
+                }catch (IOException ex) { condition = false; }
         }
         try {
             as.shutdownOutput();

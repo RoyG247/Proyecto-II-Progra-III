@@ -603,16 +603,36 @@ public class Worker {
                             System.out.println(">>> Usuario recibido: " + user.getClass().getName());
                             os.writeInt(Protocol.ERROR_NO_ERROR);
                             srv.deliver_user(this, user);
+                            srv.deliver_users(this, user);
                         }catch (Exception ex) {
                             System.out.println(">>> ERROR en LOGIN: " + ex.getMessage());
                             os.writeInt(Protocol.ERROR_ERROR);
                         }
                         break;
 
+                    case Protocol.DELIVER_MESSAGE:
+                        System.out.println(">>> Tipo: DELIVER_MESSAGE");
+                        try {
+                            String message = (String) is.readObject();
+                            System.out.println(">>> Mensaje recibido: " + message);
+                            srv.deliver_message(this, message);
+                            os.writeInt(Protocol.ERROR_NO_ERROR);
+                        }catch (Exception ex) {
+                            System.out.println(">>> ERROR en DELIVER_MESSAGE: " + ex.getMessage());
+                            os.writeInt(Protocol.ERROR_ERROR);
+                        }
+                        break;
+
                     case Protocol.DISCONNECT:
-                        System.out.println(">>> Tipo: DISCONNECT");
-                        stop();
-                        srv.remove(this);
+                        try {
+                            System.out.println(">>> Tipo: DISCONNECT");
+                            srv.remove(this);
+                            stop();
+                            os.writeInt(Protocol.ERROR_NO_ERROR);
+                        }catch (Exception ex) {
+                            System.out.println(">>> ERROR en DISCONNECT: " + ex.getMessage());
+                            os.writeInt(Protocol.ERROR_ERROR);
+                        }
                         break;
 
                     default:
@@ -635,6 +655,28 @@ public class Worker {
             try {
                 aos.writeInt(Protocol.DELIVER_EMPLOYEE);
                 aos.writeObject(e);
+                aos.flush();
+            } catch (IOException ex) {
+            }
+        }
+    }
+
+    public synchronized void deliver_users(List<Empleado> e){
+        if (as != null){
+            try {
+                aos.writeInt(Protocol.DELIVER_EMPLOYEES);
+                aos.writeObject(e);
+                aos.flush();
+            } catch (IOException ex) {
+            }
+        }
+    }
+
+    public synchronized void deliver_message(String message){
+        if (as != null){
+            try {
+                aos.writeInt(Protocol.DELIVER_MESSAGE);
+                aos.writeObject(message);
                 aos.flush();
             } catch (IOException ex) {
             }

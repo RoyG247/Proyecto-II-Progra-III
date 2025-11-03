@@ -12,11 +12,13 @@ import java.util.List;
 public class Server {
     ServerSocket ss;
     List<Worker> workers;
+    List<Empleado> empleados;
 
     public Server(){
         try {
             ss = new ServerSocket(Protocol.PORT);
             workers = Collections.synchronizedList(new ArrayList<Worker>());
+            empleados = Collections.synchronizedList(new ArrayList<Empleado>());
             System.out.println("Server Started");
         } catch (IOException ex) { System.out.println(ex); }
     }
@@ -77,7 +79,33 @@ public class Server {
             }
         }
     }
+    public void deliver_users(Worker from, Empleado e) {
+        empleados.add(e);
+        List<Empleado> result = new ArrayList<>();
+        List<Empleado> result2 = new ArrayList<>();
+        for (Worker w : workers) {
+            if (w != from) {
+                result.add(e);
+                w.deliver_users(result);
+            }
+        }
 
-    public void deliver_message(){
+        if(from != null){
+            for(Empleado emp : empleados){
+                if(emp != e){
+                    result2.add(emp);
+                }
+            }
+            from.deliver_users(result2);
+        }
+
+    }
+
+    public void deliver_message(Worker from, String message){
+        for(Worker w : workers){
+            if(w != from){
+                w.deliver_message(message);
+            }
+        }
     }
 }

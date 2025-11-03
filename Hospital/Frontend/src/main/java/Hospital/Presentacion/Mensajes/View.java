@@ -1,10 +1,12 @@
 package Hospital.Presentacion.Mensajes;
 
 import Hospital.Logic.Empleado;
+import Hospital.Logic.Prescripcion;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableColumn;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -17,6 +19,38 @@ public class View implements PropertyChangeListener {
     private JTextField prueba;
 
     public View() {
+        btnEnviar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = table1.getSelectedRow();
+                if (row >= 0) {
+                    int id = (int) table1.getValueAt(row, 0);
+                    try {
+                        String msg = prueba.getText();
+                        controller.send_message(id ,msg);
+                        prueba.setText("");
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(main1, ex.getMessage(), "Información", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }
+                JOptionPane.showMessageDialog(main1, "selecione un empleado", "Información", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        btnRecibir.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = table1.getSelectedRow();
+                if (row >= 0) {
+                    int id = (int) table1.getValueAt(row, 0);
+                    try {
+                        JOptionPane.showMessageDialog(main1, controller.message() + " De: " + id, "Información", JOptionPane.INFORMATION_MESSAGE);
+                    } catch(Exception ex){
+                    JOptionPane.showMessageDialog(main1, ex.getMessage(), "Información", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+                JOptionPane.showMessageDialog(main1, "selecione un empleado", "Información", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
 
     }
     public JPanel getPanel() {
@@ -33,7 +67,7 @@ public class View implements PropertyChangeListener {
     public void setModel(Model model) {
         this.model = model;
         model.addPropertyChangeListener(this);
-        if (this.controller != null) {
+        if(this.controller != null){
             controller.cargarEmpleados();
         }
     }
@@ -42,14 +76,6 @@ public class View implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         switch (evt.getPropertyName()) {
-            case Model.USER_ONLINE:
-                Empleado usuario = (Empleado) evt.getNewValue();
-                if (usuario != null) {
-                    prueba.setText("Usuario en línea: " + usuario.getNombre());
-                } else {
-                    break;
-                }
-                break;
             case Model.USERS:
                 int[] cols = {TableModel.ID, TableModel.BUTTON};
                 table1.setModel(new TableModel(cols, model.getUsers()) {

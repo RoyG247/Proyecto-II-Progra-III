@@ -8,9 +8,11 @@ import java.util.ArrayList;
 public class Model extends AbstractModel{
     Empleado currentUser;
     ArrayList<Empleado> users;
+    String message;
 
     public static final String USER_ONLINE = "online";
     public static final String USERS = "usuarios";
+
     public Model() {
         this.users = new ArrayList<>();
         this.currentUser = new Empleado();
@@ -44,5 +46,12 @@ public class Model extends AbstractModel{
         firePropertyChange(USERS, oldUsers, users);
     }
 
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
 }
