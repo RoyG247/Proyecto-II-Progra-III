@@ -1,9 +1,15 @@
 package Hospital.Logic;
 
-public class Mensaje {
+import java.io.Serializable;
+
+public class Mensaje implements Serializable {
     String idEmisor;
     String idReceptor;
     String contenido;
+
+    public Mensaje(){
+
+    }
 
     public Mensaje(String idEmisor, String idReceptor, String contenido) {
         this.idEmisor = idEmisor;

@@ -463,8 +463,8 @@ public class Service {
         //sendRequestNoObject(Protocol.RECEIVE_USERS, null);
     }
 
-    public void send_message(int e , String msg) throws Exception {
-        sendRequestNoObject(Protocol.DELIVER_MESSAGE, msg);
+    public void send_message(Mensaje msg) throws Exception {
+       sendRequestNoObject(Protocol.DELIVER_MESSAGE, msg);
     }
 
     public void stop(Empleado emp) {

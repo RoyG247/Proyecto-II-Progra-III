@@ -1,6 +1,7 @@
 package Hospital.Presentacion.Mensajes;
 
 import Hospital.Logic.Empleado;
+import Hospital.Logic.Mensaje;
 import Hospital.Logic.Service;
 import Hospital.Presentacion.Sesion;
 import Hospital.Presentacion.ThreadListener;
@@ -45,12 +46,17 @@ public class Controller implements ThreadListener {
         }
     }
 
-    public void send_message(int id, String msg) throws Exception {
-        Service.instance().send_message(id, msg);
+    public void send_message(Mensaje msg) throws Exception {
+        msg.setIdEmisor(Sesion.getUsuario().getId());
+        Service.instance().send_message(msg);
     }
 
-    public String message() {
-        return model.getMessage();
+    public void limpiar(){
+        model.setCurrentMessage(null);
+    }
+
+    public Mensaje message() {
+        return model.getCurrentmessage();
     }
 
     // Implementación de ThreadListener
@@ -65,8 +71,8 @@ public class Controller implements ThreadListener {
     }
 
     @Override
-    public void deliver_message(String message) {
-        model.setMessage(message);
+    public void deliver_message(Mensaje message) {
+        model.setCurrentMessage(message);
     }
 
     public void stop() {

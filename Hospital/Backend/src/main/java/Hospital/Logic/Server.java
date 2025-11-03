@@ -114,13 +114,12 @@ public class Server {
         return usuariosConectados;
     }
 
-    public void deliver_message(Worker from, String message) {
-        for (Worker w : workers) {
-            if (w != from) {
+    public void deliver_message(Worker from, Mensaje message) {
+        for (Worker w: workers){
+            if(w.getEmpleadoAsociado().getId().equals(message.getIdReceptor())){
                 w.deliver_message(message);
             }
         }
     }
-
 
 }

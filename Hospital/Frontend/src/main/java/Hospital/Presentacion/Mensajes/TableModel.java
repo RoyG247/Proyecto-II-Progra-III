@@ -49,4 +49,44 @@ public class TableModel extends AbstractTableModel<Empleado> implements javax.sw
         }
     }
 
+    public void marcarEmpleado(String idEmpleado) {
+        try {
+            Integer id = Integer.valueOf(idEmpleado);
+            seleccionados.put(id, true);
+
+            for (int i = 0; i < rows.size(); i++) {
+                if (rows.get(i).getId().equals(idEmpleado)) {
+                    fireTableCellUpdated(i, getColumnIndex(BUTTON));
+                    break;
+                }
+            }
+        } catch (NumberFormatException e) {
+            // Ignorar si el ID no es válido
+        }
+    }
+    public void desmarcarEmpleado(String idEmpleado) {
+        try {
+            Integer id = Integer.valueOf(idEmpleado);
+            seleccionados.put(id, false);
+
+            for (int i = 0; i < rows.size(); i++) {
+                if (rows.get(i).getId().equals(idEmpleado)) {
+                    fireTableCellUpdated(i, getColumnIndex(BUTTON));
+                    break;
+                }
+            }
+        } catch (NumberFormatException e) {
+            // Ignorar si el ID no es válido
+        }
+    }
+
+    private int getColumnIndex(int colType) {
+        for (int i = 0; i < cols.length; i++) {
+            if (cols[i] == colType) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
 }

@@ -1,6 +1,7 @@
 package Hospital.Presentacion.Mensajes;
 
 import Hospital.Logic.Empleado;
+import Hospital.Logic.Mensaje;
 import Hospital.Logic.Protocol;
 import Hospital.Presentacion.ThreadListener;
 
@@ -61,7 +62,7 @@ public class SocketListener {
                         break;
                         case Protocol.DELIVER_MESSAGE:
                         try {
-                            String message = (String) ais.readObject();
+                            Mensaje message = (Mensaje) ais.readObject();
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() { listener.deliver_message(message); } });
                         } catch (ClassNotFoundException ex) {}

@@ -627,7 +627,6 @@ public class Worker {
                             System.out.println(">>> Usuario recibido: " + user.getClass().getName());
                             os.writeInt(Protocol.ERROR_NO_ERROR);
                             os.flush();
-                            // Enviar información de usuarios conectados al nuevo usuario
                             srv.deliver_users(this, user);
                         } catch (Exception ex) {
                             System.out.println(">>> ERROR en LOGIN: " + ex.getMessage());
@@ -638,10 +637,11 @@ public class Worker {
                     case Protocol.DELIVER_MESSAGE:
                         System.out.println(">>> Tipo: DELIVER_MESSAGE");
                         try {
-                            String message = (String) is.readObject();
+                            Mensaje message = (Mensaje) is.readObject();
                             System.out.println(">>> Mensaje recibido: " + message);
-                            srv.deliver_message(this, message);
                             os.writeInt(Protocol.ERROR_NO_ERROR);
+                            os.flush();
+                            srv.deliver_message(this, message);
                         }catch (Exception ex) {
                             System.out.println(">>> ERROR en DELIVER_MESSAGE: " + ex.getMessage());
                             os.writeInt(Protocol.ERROR_ERROR);
@@ -702,7 +702,7 @@ public class Worker {
         }
     }
 
-    public synchronized void deliver_message(String message){
+    public synchronized void deliver_message(Mensaje message){
         if (as != null){
             try {
                 aos.writeInt(Protocol.DELIVER_MESSAGE);
