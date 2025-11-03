@@ -16,7 +16,7 @@ public class View implements PropertyChangeListener {
     private JButton btnEnviar;
     private JButton btnRecibir;
     private JTable table1;
-    private JTextField prueba;
+    private JTextArea prueba;
 
     public View() {
         btnEnviar.addActionListener(new ActionListener() {
